@@ -4,236 +4,145 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Thamer Almutairi</title>
+    <link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet">
     <style>
-        /* --- 1. The Foundation --- */
         :root {
-            --bg: #080808;       /* Deep matte black */
-            --panel: #111111;    /* Slightly lighter for cards */
-            --border: #222222;   /* Subtle borders */
-            --text-main: #ededed;
-            --text-muted: #888888;
-            --accent: #fff;      /* Stark white for emphasis */
-            --success: #27c93f;  /* Apple/Terminal Green */
-            
-            --font-mono: 'SF Mono', 'Menlo', 'Monaco', 'Courier New', monospace;
-            --font-sans: -apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', Roboto, sans-serif;
-            
-            --radius: 8px;
-            --max-w: 680px;
+            --bg: #000;
+            --text: #7a7a7a;
+            --accent: #d1d1d1;
+            --border: #1a1a1a;
+            --font-pixel: 'VT323', monospace;
         }
 
-        /* --- 2. Reset & Base --- */
-        * { box-sizing: border-box; margin: 0; padding: 0; }
+        * { box-sizing: border-box; margin: 0; padding: 0; cursor: crosshair; }
 
         body {
-            background-color: var(--bg);
-            color: var(--text-main);
-            font-family: var(--font-sans);
-            font-size: 16px;
-            line-height: 1.65;
-            padding: 4rem 1.5rem;
-            -webkit-font-smoothing: antialiased;
+            background: var(--bg);
+            color: var(--text);
+            font-family: var(--font-pixel);
+            font-size: 1.3rem;
+            line-height: 1.4;
+            padding: 5rem 1.5rem;
+            overflow: hidden;
         }
 
-        main {
-            max-width: var(--max-w);
-            margin: 0 auto;
+        /* Scanlines Effect like the image */
+        body::before {
+            content: "";
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.1) 50%), 
+                        linear-gradient(90deg, rgba(255, 0, 0, 0.02), rgba(0, 255, 0, 0.01), rgba(0, 0, 255, 0.02));
+            background-size: 100% 3px, 3px 100%;
+            pointer-events: none;
+            z-index: 100;
         }
 
-        /* --- 3. Typography --- */
-        h1 {
-            font-size: 1.75rem;
-            font-weight: 700;
-            color: var(--text-main);
-            letter-spacing: -0.03em;
-            margin-bottom: 0.25rem;
-        }
+        main { max-width: 500px; margin: 0 auto; position: relative; z-index: 10; }
 
-        h2 {
-            font-size: 0.75rem;
-            text-transform: uppercase;
-            letter-spacing: 0.1em;
-            color: var(--text-muted);
-            margin-top: 3.5rem;
-            margin-bottom: 1.25rem;
-            font-family: var(--font-mono);
-            font-weight: 500;
-        }
-
-        p { color: #bbbbbb; margin-bottom: 1.5rem; }
-
-        a { text-decoration: none; color: inherit; transition: opacity 0.2s; }
-        a:hover { opacity: 0.8; }
-
-        /* --- 4. Profile Header --- */
-        .profile-section {
+        header {
             display: flex;
-            align-items: flex-start;
             justify-content: space-between;
-            gap: 2rem;
-            margin-bottom: 2rem;
-            border-bottom: 1px solid var(--border);
-            padding-bottom: 2rem;
+            align-items: center;
+            margin-bottom: 3rem;
         }
+
+        h1 { color: var(--accent); font-size: 2.2rem; font-weight: normal; }
 
         .avatar {
-            width: 100px;
-            height: 100px;
-            border-radius: var(--radius);
-            object-fit: cover;
-            background-color: var(--panel); /* Placeholder color if image fails */
+            width: 75px;
+            height: 75px;
+            filter: grayscale(100%) brightness(0.6);
             border: 1px solid var(--border);
-            filter: grayscale(100%);
-            transition: filter 0.3s ease;
         }
 
-        .avatar:hover { filter: grayscale(0%); }
-
-        .meta-tag {
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            font-family: var(--font-mono);
-            font-size: 0.8rem;
-            color: var(--text-muted);
-            margin-top: 0.5rem;
-            background: rgba(255,255,255,0.03);
-            padding: 4px 8px;
-            border-radius: 4px;
-        }
-
-        .status-dot {
-            width: 6px;
-            height: 6px;
-            background-color: var(--success);
-            border-radius: 50%;
-            box-shadow: 0 0 8px rgba(39, 201, 63, 0.4);
-        }
-
-        /* --- 5. Certs & Badges --- */
-        .badges { display: flex; flex-wrap: wrap; gap: 0.6rem; }
+        section { margin-bottom: 2rem; }
         
-        .badge {
-            font-family: var(--font-mono);
-            font-size: 0.75rem;
-            color: var(--text-main);
-            background: var(--panel);
-            border: 1px solid var(--border);
-            padding: 0.3rem 0.6rem;
-            border-radius: 4px;
-        }
+        p { margin-bottom: 1rem; color: #555; }
+        strong { color: var(--accent); font-weight: normal; }
 
-        /* --- 6. The Grid (Socials) --- */
-        .grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 1rem;
-        }
-
-        .card {
-            background: var(--panel);
+        .links { display: flex; flex-direction: column; gap: 10px; }
+        .link-item {
+            text-decoration: none;
+            color: var(--text);
+            padding: 12px;
             border: 1px solid var(--border);
-            padding: 1.25rem;
-            border-radius: var(--radius);
-            transition: transform 0.2s ease, border-color 0.2s ease;
             display: flex;
-            flex-direction: column;
+            justify-content: space-between;
+            transition: 0.2s;
+        }
+        .link-item:hover { background: rgba(255, 255, 255, 0.03); color: var(--accent); }
+
+        .click-anywhere {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.9);
+            display: flex;
             justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            color: var(--accent);
+            cursor: pointer;
         }
 
-        .card:hover {
-            transform: translateY(-2px);
-            border-color: #444;
-        }
-
-        .card-label {
-            font-size: 0.75rem;
-            color: var(--text-muted);
-            font-family: var(--font-mono);
-            margin-bottom: 0.25rem;
-        }
-
-        .card-value {
-            font-size: 0.95rem;
-            font-weight: 500;
-            color: var(--text-main);
-        }
-
-        /* --- 7. Mobile --- */
-        @media (max-width: 600px) {
-            .profile-section { flex-direction: column-reverse; align-items: flex-start; }
-            .avatar { width: 80px; height: 80px; }
-            .grid { grid-template-columns: 1fr; }
-        }
     </style>
 </head>
 <body>
 
+    <div id="overlay" class="click-anywhere">
+        [ click to enter ]
+    </div>
+
     <main>
-        <header class="profile-section">
+   <header>
             <div>
                 <h1>Thamer Almutairi</h1>
-                <p style="margin-bottom: 0.5rem; color: var(--text-muted);">Pentester & Developer</p>
-                
-                <div class="meta-tag">
-                    <span class="status-dot"></span>
-                    Kuwait • 17 y/o
-                </div>
+                <p style="font-size: 1rem; color: #444;">pentester / student</p>
+                <p style="font-size: 0.9rem; color: #333; margin-top: 5px;">Kuwait • 17 y/o</p>
             </div>
-            
-            <img src="./a.jpg" alt="Profile" class="avatar">
+            <img src="./1.jpg" alt="" class="avatar">
         </header>
 
         <section>
-            <div class="badges">
-                <span class="badge">eCPPTv3</span>
-                <span class="badge">eWPTXv3</span>
-                <span class="badge">CRTA</span>
-                <span class="badge">eJPTv2</span>
-                <span class="badge">PT1</span>
+            <h2 style="color: #444; font-size: 0.8rem; text-transform: lowercase; margin-bottom: 0.8rem; border-bottom: 1px solid var(--border); display: inline-block;">My Certifications</h2>
+            <div style="display: flex; flex-wrap: wrap; gap: 8px; margin-top: 5px;">
+                <span style="border: 1px solid var(--border); padding: 2px 6px; font-size: 0.8rem; color: #555;">eCPPTv3</span>
+                <span style="border: 1px solid var(--border); padding: 2px 6px; font-size: 0.8rem; color: #555;">eWPTXv3</span>
+                <span style="border: 1px solid var(--border); padding: 2px 6px; font-size: 0.8rem; color: #555;">CRTA</span>
+                <span style="border: 1px solid var(--border); padding: 2px 6px; font-size: 0.8rem; color: #555;">eJPTv2</span>
+                <span style="border: 1px solid var(--border); padding: 2px 6px; font-size: 0.8rem; color: #555;">PT1</span>
             </div>
         </section>
 
         <section>
-            <h2>Bio</h2>
             <p>
-                I’m a penetration tester and developer focused on understanding how real-world attacks actually happen. I’m mostly into <strong>Red Teaming</strong> and learning how attackers move through systems in real environments.
+                Kuwaiti penetration tester and developer. Focused on <strong>Red Teaming</strong> and system intrusion
             </p>
             <p>
-                I look into malware development sometimes, mainly to understand how it works rather than to specialize in it. Outside of security, I’m into <strong>chess</strong>, <strong>bodybuilding</strong>, and <strong>gaming</strong>.
+                Interested in <strong>chess</strong>, <strong>bodybuilding</strong>, and <strong>gaming</strong>
             </p>
         </section>
-
-        <section>
-            <h2>Network</h2>
-            <div class="grid">
-                <a href="https://discord.gg/36WpBTtNum" target="_blank" class="card">
-                    <span class="card-label">Discord Community</span>
-                    <span class="card-value">Join Server ↗</span>
-                </a>
-
-                <a href="https://twitter.com/sliusx" target="_blank" class="card">
-                    <span class="card-label">X / Twitter</span>
-                    <span class="card-value">@sliusx</span>
-                </a>
-
-                <a href="https://instagram.com/4lmutairi1337" target="_blank" class="card">
-                    <span class="card-label">Instagram</span>
-                    <span class="card-value">@4lmutairi1337</span>
-                </a>
-
-                <a href="https://tiktok.com/@itkilh" target="_blank" class="card">
-                    <span class="card-label">TikTok</span>
-                    <span class="card-value">@itkilh</span>
-                </a>
+            <div class="links">
+                <a href="https://twitter.com/sliusx" class="link-item"><span>twitter</span> <span>@sliusx</span></a>
+                <a href="https://discord.gg/36WpBTtNum" class="link-item"><span>discord</span> <span>join</span></a>
+                <a href="https://instagram.com/4lmutairi1337" class="link-item"><span>instagram</span> <span>@4lmutairi1337</span></a>
             </div>
         </section>
-
-        <section style="margin-top: 4rem; font-family: var(--font-mono); font-size: 0.75rem; color: #333;">
-            root@thamer:~# <span style="animation: blink 1s infinite">_</span>
-        </section>
-
     </main>
+
+    <audio id="bgAudio" loop>
+        <source src="another_life.mp3" type="audio/mpeg">
+    </audio>
+
+    <script>
+        const overlay = document.getElementById('overlay');
+        const audio = document.getElementById('bgAudio');
+
+        overlay.addEventListener('click', () => {
+            audio.play();
+            overlay.style.display = 'none';
+        });
+    </script>
 
 </body>
 </html>
