@@ -6,7 +6,7 @@
     <title>Thamer Almutairi</title>
     <link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet">
     <style>
-        :root {
+:root {
             --bg: #000;
             --text: #7a7a7a;
             --accent: #d1d1d1;
@@ -16,6 +16,11 @@
 
         * { box-sizing: border-box; margin: 0; padding: 0; cursor: crosshair; }
 
+        /* FIX: Lock horizontal scroll on the HTML level for mobile */
+        html {
+            overflow-x: hidden;
+        }
+
         body {
             background: var(--bg);
             color: var(--text);
@@ -23,9 +28,8 @@
             font-size: 1.3rem;
             line-height: 1.4;
             padding: 5rem 1.5rem;
-            /* CHANGED: Allowed vertical scrolling, blocked horizontal */
-            overflow-x: hidden; 
-            overflow-y: auto;
+            overflow-x: hidden;
+            /* FIX: Let the browser handle vertical scrolling natively */
         }
 
         /* Scanlines Effect */
@@ -40,7 +44,14 @@
             z-index: 100;
         }
 
-        main { max-width: 500px; margin: 0 auto; position: relative; z-index: 10; }
+        /* FIX: Added padding-bottom so you have room to scroll past the last link */
+        main { 
+            max-width: 500px; 
+            margin: 0 auto; 
+            position: relative; 
+            z-index: 10; 
+            padding-bottom: 4rem; 
+        }
 
         header {
             display: flex;
@@ -94,7 +105,7 @@
             width: 18px;
             height: 18px;
             fill: currentColor;
-            shape-rendering: crispEdges; /* Forces blocky rendering */
+            shape-rendering: crispEdges;
         }
 
         .click-anywhere {
@@ -108,8 +119,7 @@
             color: var(--accent);
             cursor: pointer;
         }
-
-    </style>
+</style>
 </head>
 <body>
 
