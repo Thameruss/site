@@ -23,7 +23,9 @@
             font-size: 1.3rem;
             line-height: 1.4;
             padding: 5rem 1.5rem;
-            overflow: hidden;
+            /* CHANGED: Allowed vertical scrolling, blocked horizontal */
+            overflow-x: hidden; 
+            overflow-y: auto;
         }
 
         /* Scanlines Effect */
@@ -111,8 +113,6 @@
 </head>
 <body>
 
- 
-
     <main>
         <header>
             <div>
@@ -189,8 +189,6 @@
             </div>
         </section>
     </main>
-
-  
 
 </body>
 </html>
