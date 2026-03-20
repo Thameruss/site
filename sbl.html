@@ -1,0 +1,1407 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Science-Based Lifting — Thamer Almutairi</title>
+  <link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet"/>
+  <style>
+    :root {
+      --bg:      #000;
+      --text:    #7a7a7a;
+      --accent:  #d1d1d1;
+      --bright:  #e8e8e8;
+      --border:  #1a1a1a;
+      --border2: #222;
+      --lime:    #b8ff00;
+      --red:     #ff3b3b;
+      --dim:     #333;
+      --dimmer:  #252525;
+      --font:    'VT323', monospace;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; cursor: crosshair; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--font);
+      font-size: 1.25rem;
+      line-height: 1.5;
+      padding: 0;
+      overflow-x: clip;
+    }
+
+    /* scanlines — same as index */
+    body::before {
+      content: "";
+      position: fixed;
+      top: 0; left: 0; width: 100%; height: 100%;
+      background:
+        linear-gradient(rgba(18,16,16,0) 50%, rgba(0,0,0,0.08) 50%),
+        linear-gradient(90deg, rgba(255,0,0,0.02), rgba(0,255,0,0.01), rgba(0,0,255,0.02));
+      background-size: 100% 3px, 3px 100%;
+      pointer-events: none;
+      z-index: 200;
+    }
+
+    ::selection { background: var(--lime); color: #000; }
+
+    a { color: var(--text); text-decoration: none; }
+    a:hover { color: var(--accent); }
+    strong { color: var(--accent); font-weight: normal; }
+
+    /* ── SCROLL PROGRESS ── */
+    #prog {
+      position: fixed; top: 0; left: 0;
+      height: 1px; width: 0%;
+      background: var(--lime);
+      z-index: 300;
+      transition: width .05s linear;
+    }
+
+    /* ── NAV ── */
+    nav {
+      position: fixed; top: 0; left: 0; right: 0;
+      z-index: 100;
+      border-bottom: 1px solid var(--border);
+      background: rgba(0,0,0,0.93);
+      backdrop-filter: blur(8px);
+    }
+    .nav-inner {
+      max-width: 760px; margin: 0 auto; padding: 0 1.5rem;
+      display: flex; align-items: center; justify-content: space-between;
+      height: 48px;
+    }
+    .nav-back {
+      font-family: var(--font);
+      font-size: 1rem;
+      color: var(--dim);
+      display: flex; align-items: center; gap: 0.5rem;
+      transition: color .2s;
+    }
+    .nav-back:hover { color: var(--accent); }
+    .nav-title {
+      font-family: var(--font);
+      font-size: 0.85rem;
+      color: var(--dimmer);
+      letter-spacing: 1px;
+    }
+    .nav-right {
+      font-family: var(--font);
+      font-size: 0.85rem;
+      color: var(--dimmer);
+    }
+
+    /* ── WRAP ── */
+    .wrap {
+      max-width: 760px;
+      margin: 0 auto;
+      padding: 0 1.5rem;
+    }
+
+    /* ── PAPER HEADER ── */
+    #paper-head {
+      padding-top: 48px;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 3rem;
+      margin-bottom: 0;
+    }
+    .paper-meta-top {
+      padding-top: 2.5rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      flex-wrap: wrap;
+      gap: 1rem;
+      margin-bottom: 2rem;
+    }
+    .paper-journal {
+      font-size: 0.8rem;
+      color: var(--dim);
+      letter-spacing: 1px;
+      line-height: 1.7;
+    }
+    .paper-journal span { color: var(--dimmer); }
+
+    .paper-title {
+      font-size: clamp(1.8rem, 5vw, 3rem);
+      color: var(--accent);
+      line-height: 1.1;
+      letter-spacing: 0;
+      margin-bottom: 1rem;
+    }
+    .paper-subtitle {
+      font-size: 1rem;
+      color: var(--dim);
+      margin-bottom: 2rem;
+      line-height: 1.5;
+    }
+
+    .paper-author-row {
+      display: flex;
+      gap: 2rem;
+      flex-wrap: wrap;
+      padding: 1.25rem 0;
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 1.5rem;
+    }
+    .paper-author {
+      font-size: 0.85rem;
+      color: var(--dim);
+      line-height: 1.6;
+    }
+    .paper-author strong { color: var(--accent); }
+
+    .paper-tags {
+      display: flex; flex-wrap: wrap; gap: 6px;
+      margin-bottom: 1.5rem;
+    }
+    .ptag {
+      border: 1px solid var(--border);
+      padding: 1px 8px;
+      font-size: 0.75rem;
+      color: var(--dim);
+      letter-spacing: 0.5px;
+    }
+    .ptag.lime { border-color: rgba(184,255,0,0.2); color: rgba(184,255,0,0.5); }
+
+    /* abstract box */
+    .abstract {
+      border: 1px solid var(--border);
+      padding: 1.25rem 1.5rem;
+      margin-bottom: 1rem;
+      background: rgba(255,255,255,0.01);
+    }
+    .abstract-label {
+      font-size: 0.75rem;
+      color: var(--dim);
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      margin-bottom: 0.75rem;
+      display: block;
+    }
+    .abstract p {
+      font-size: 1rem;
+      color: var(--text);
+      line-height: 1.6;
+      max-width: none;
+    }
+
+    /* ── SECTION ── */
+    .sec {
+      padding: 3rem 0;
+      border-bottom: 1px solid var(--border);
+    }
+    .sec:last-of-type { border-bottom: none; }
+
+    .sec-header {
+      display: flex;
+      align-items: baseline;
+      gap: 1rem;
+      margin-bottom: 2rem;
+      padding-bottom: 0.75rem;
+      border-bottom: 1px solid var(--border);
+    }
+    .sec-n {
+      font-size: 0.75rem;
+      color: var(--dimmer);
+      letter-spacing: 1px;
+      flex-shrink: 0;
+    }
+    .sec-title {
+      font-size: clamp(1.1rem, 3vw, 1.5rem);
+      color: var(--accent);
+      line-height: 1.1;
+    }
+
+    /* prose */
+    .prose {
+      font-size: 1.1rem;
+      color: var(--text);
+      line-height: 1.65;
+      max-width: none;
+    }
+    .prose + .prose { margin-top: 1rem; }
+    .prose strong { color: var(--accent); }
+    .prose em { color: var(--dim); font-style: normal; }
+
+    /* callout */
+    .callout {
+      border-left: 2px solid var(--lime);
+      padding: 0.75rem 1.25rem;
+      margin: 1.5rem 0;
+      background: rgba(184,255,0,0.02);
+    }
+    .callout .prose { color: var(--accent); }
+
+    /* ref badge inline */
+    .r {
+      font-size: 0.7rem;
+      color: var(--dimmer);
+      border: 1px solid var(--border);
+      padding: 0 4px;
+      cursor: default;
+      transition: color .15s, border-color .15s;
+      white-space: nowrap;
+    }
+    .r:hover { color: var(--lime); border-color: rgba(184,255,0,0.3); }
+
+    /* ── FACT BLOCK ── */
+    .fact {
+      padding: 1.75rem 0;
+      border-bottom: 1px solid var(--border);
+    }
+    .fact:last-child { border-bottom: none; }
+    .fact-num {
+      font-size: 0.72rem;
+      color: var(--dimmer);
+      letter-spacing: 1px;
+      margin-bottom: 0.4rem;
+      display: block;
+    }
+    .fact-claim {
+      font-size: clamp(1.1rem, 2.5vw, 1.4rem);
+      color: var(--accent);
+      margin-bottom: 0.75rem;
+      line-height: 1.2;
+    }
+    .fact-stat {
+      font-size: clamp(2rem, 6vw, 3.5rem);
+      color: var(--lime);
+      line-height: 1;
+      letter-spacing: -1px;
+      display: block;
+      margin-bottom: 0.3rem;
+    }
+
+    /* RIR bar */
+    .rir-rows { margin-top: 1.25rem; display: flex; flex-direction: column; gap: 0.5rem; }
+    .rir-row { display: flex; align-items: center; gap: 1rem; }
+    .rir-lbl {
+      font-size: 0.8rem;
+      color: var(--dim);
+      width: 52px;
+      flex-shrink: 0;
+    }
+    .rir-track { flex: 1; height: 2px; background: var(--border); }
+    .rir-fill { height: 2px; }
+    .rir-desc { font-size: 0.75rem; color: var(--dimmer); width: 200px; flex-shrink: 0; }
+    @media (max-width: 500px) { .rir-desc { display: none; } }
+
+    /* rep range table */
+    .mini-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.9rem;
+      margin-top: 1rem;
+    }
+    .mini-table th {
+      font-size: 0.7rem;
+      color: var(--dimmer);
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      padding: 0.4rem 0.75rem;
+      text-align: left;
+      border-bottom: 1px solid var(--border);
+      font-weight: normal;
+    }
+    .mini-table td {
+      padding: 0.5rem 0.75rem;
+      color: var(--text);
+      border-bottom: 1px solid var(--border);
+      vertical-align: middle;
+    }
+    .mini-table tr:last-child td { border-bottom: none; }
+    .mini-table tr:hover td { background: rgba(255,255,255,0.015); }
+    .td-ok  { color: var(--lime); font-size: 0.75rem; letter-spacing: 1px; }
+    .td-mid { color: var(--text); font-size: 0.75rem; }
+    .td-dim { color: var(--dim); font-size: 0.75rem; }
+
+    /* ── MUSCLE SECTION ── */
+    .muscle-block {
+      padding: 2rem 0;
+      border-bottom: 1px solid var(--border);
+    }
+    .muscle-block:last-child { border-bottom: none; }
+
+    .muscle-label {
+      font-size: 0.72rem;
+      color: var(--lime);
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      margin-bottom: 0.5rem;
+      display: block;
+    }
+    .muscle-name {
+      font-size: clamp(1.2rem, 3vw, 1.8rem);
+      color: var(--accent);
+      margin-bottom: 1.5rem;
+      line-height: 1.1;
+    }
+
+    .muscle-grid {
+      display: grid;
+      grid-template-columns: 240px 1fr;
+      gap: 2rem;
+      align-items: start;
+    }
+    @media (max-width: 600px) { .muscle-grid { grid-template-columns: 1fr; } }
+
+    .muscle-img {
+      border: 1px solid var(--border);
+      aspect-ratio: 3/4;
+      overflow: hidden;
+      position: relative;
+      background: #080808;
+    }
+    .muscle-img img {
+      width: 100%; height: 100%;
+      object-fit: cover;
+      display: block;
+      filter: grayscale(60%) brightness(0.75) contrast(1.1);
+      transition: filter .4s;
+    }
+    .muscle-img:hover img {
+      filter: grayscale(20%) brightness(0.9) contrast(1.05);
+    }
+    .muscle-img-cap {
+      position: absolute; bottom: 0; left: 0; right: 0;
+      background: linear-gradient(transparent, rgba(0,0,0,0.8));
+      padding: 1.5rem 0.75rem 0.5rem;
+      font-size: 0.65rem;
+      color: var(--dim);
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+    }
+    /* fallback */
+    .muscle-img-placeholder {
+      width: 100%; height: 100%;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      gap: 0.5rem;
+    }
+    .muscle-img-placeholder span {
+      font-size: 0.65rem;
+      color: var(--dimmer);
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+    }
+
+    /* exercise list */
+    .ex-list { display: flex; flex-direction: column; }
+    .ex-item {
+      padding: 0.9rem 0;
+      border-bottom: 1px solid var(--border);
+    }
+    .ex-item:first-child { padding-top: 0; }
+    .ex-item:last-child { border-bottom: none; }
+
+    .ex-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 0.75rem;
+      margin-bottom: 0.3rem;
+      flex-wrap: wrap;
+    }
+    .ex-name {
+      font-size: 1rem;
+      color: var(--accent);
+    }
+    .ex-type {
+      font-size: 0.65rem;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      flex-shrink: 0;
+    }
+    .ex-type.cmp { color: rgba(184,255,0,0.5); }
+    .ex-type.iso { color: var(--dim); }
+
+    .ex-body {
+      font-size: 0.9rem;
+      color: var(--text);
+      line-height: 1.55;
+    }
+    .ex-body strong { color: var(--accent); }
+
+    /* ── PROGRAM ── */
+    .week-grid {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      border: 1px solid var(--border);
+      margin: 1.5rem 0;
+    }
+    .wd {
+      padding: 0.6rem 0.3rem;
+      text-align: center;
+      border-right: 1px solid var(--border);
+    }
+    .wd:last-child { border-right: none; }
+    .wd-name {
+      font-size: 0.62rem;
+      color: var(--dimmer);
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      display: block;
+      margin-bottom: 0.25rem;
+    }
+    .wd-val {
+      font-size: 1rem;
+      display: block;
+    }
+    .wd-a   { color: var(--lime); }
+    .wd-b   { color: #00c8ff; }
+    .wd-off { color: var(--dimmer); font-size: 0.75rem; }
+    @media (max-width: 520px) {
+      .week-grid { grid-template-columns: repeat(4, 1fr); }
+      .wd:nth-child(4) { border-right: none; }
+      .wd:nth-child(5),
+      .wd:nth-child(6),
+      .wd:nth-child(7) { border-top: 1px solid var(--border); }
+      .wd:nth-child(8) { border-top: 1px solid var(--border); border-right: none; }
+    }
+
+    .prog-label {
+      font-size: 0.72rem;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      margin-bottom: 0.75rem;
+      margin-top: 2rem;
+      display: block;
+    }
+    .prog-label.a { color: rgba(184,255,0,0.6); }
+    .prog-label.b { color: rgba(0,200,255,0.6); }
+
+    table.prog {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.9rem;
+    }
+    table.prog thead th {
+      font-size: 0.65rem;
+      color: var(--dimmer);
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      padding: 0.4rem 0.75rem;
+      text-align: left;
+      border-bottom: 1px solid var(--border);
+      font-weight: normal;
+    }
+    table.prog tbody td {
+      padding: 0.7rem 0.75rem;
+      color: var(--text);
+      border-bottom: 1px solid var(--border);
+      vertical-align: top;
+      font-size: 0.88rem;
+    }
+    table.prog tbody tr:last-child td { border-bottom: none; }
+    table.prog tbody tr:hover td { background: rgba(255,255,255,0.015); }
+    .t-n { font-size: 0.65rem; color: var(--dimmer); letter-spacing: 1px; }
+    .t-ex { color: var(--accent); }
+    .t-sets { font-size: 0.8rem; color: var(--text); white-space: nowrap; }
+    .t-rir { font-size: 0.8rem; color: var(--lime); }
+    .t-note { font-size: 0.75rem; color: var(--dim); font-style: normal; }
+
+    /* volume bars */
+    .vol-rows { margin-top: 1.5rem; display: flex; flex-direction: column; }
+    .vol-row {
+      display: flex; align-items: center; gap: 1rem;
+      padding: 0.5rem 0;
+      border-bottom: 1px solid var(--border);
+    }
+    .vol-row:last-child { border-bottom: none; }
+    .vol-m {
+      font-size: 0.72rem; color: var(--dim);
+      letter-spacing: 1px; text-transform: uppercase;
+      width: 100px; flex-shrink: 0;
+    }
+    .vol-bg { flex: 1; height: 1px; background: var(--border); position: relative; }
+    .vol-fill { height: 1px; background: var(--lime); }
+    .vol-n { font-size: 0.7rem; color: var(--dimmer); width: 50px; text-align: right; flex-shrink: 0; }
+
+    .note-strip {
+      border: 1px solid var(--border);
+      border-left: 2px solid var(--lime);
+      padding: 1rem 1.25rem;
+      margin-top: 1.5rem;
+      font-size: 0.88rem;
+      color: var(--text);
+      line-height: 1.6;
+    }
+    .note-strip strong { color: var(--lime); }
+
+    /* overload rule */
+    .overload-box {
+      border: 1px solid var(--border);
+      padding: 1.25rem;
+      margin-top: 2rem;
+    }
+    .overload-box .ob-label {
+      font-size: 0.65rem;
+      color: var(--lime);
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      margin-bottom: 0.75rem;
+      display: block;
+    }
+    .overload-box p {
+      font-size: 0.88rem;
+      color: var(--text);
+      line-height: 1.6;
+      max-width: none;
+    }
+    .overload-box p + p { margin-top: 0.75rem; }
+
+    /* ── MYTHS ── */
+    .myth-block {
+      border: 1px solid var(--border);
+      margin-bottom: -1px;
+    }
+    .myth-block:first-child { }
+    .myth-block:last-child { margin-bottom: 0; }
+
+    .myth-inner {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+    }
+    @media (max-width: 560px) { .myth-inner { grid-template-columns: 1fr; } }
+
+    .myth-cell {
+      padding: 1rem 1.25rem;
+      font-size: 0.88rem;
+      color: var(--text);
+      line-height: 1.5;
+    }
+    .myth-cell.x {
+      border-right: 1px solid var(--border);
+      background: rgba(255,59,59,0.025);
+    }
+    @media (max-width: 560px) {
+      .myth-cell.x { border-right: none; border-bottom: 1px solid var(--border); }
+    }
+    .myth-cell.ok { background: rgba(184,255,0,0.01); }
+    .myth-mk {
+      font-size: 0.62rem;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      margin-bottom: 0.4rem;
+      display: block;
+    }
+    .myth-mk.x  { color: var(--red); }
+    .myth-mk.ok { color: var(--lime); }
+    .myth-cell strong { color: var(--accent); }
+
+    /* ── REFERENCES ── */
+    .ref-list { display: flex; flex-direction: column; }
+    .ref-entry {
+      display: flex;
+      gap: 1rem;
+      padding: 0.6rem 0;
+      border-bottom: 1px solid var(--border);
+      font-size: 0.8rem;
+      color: var(--dim);
+      line-height: 1.55;
+    }
+    .ref-entry:last-child { border-bottom: none; }
+    .ref-n { color: var(--dimmer); flex-shrink: 0; width: 28px; }
+    .ref-text em { font-style: normal; color: var(--dimmer); }
+    .ref-text a { color: var(--dimmer); font-size: 0.72rem; }
+    .ref-text a:hover { color: var(--lime); }
+
+    /* ── FOOTER ── */
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 2rem 0;
+    }
+    .foot-inner {
+      max-width: 760px; margin: 0 auto; padding: 0 1.5rem;
+      display: flex; justify-content: space-between; align-items: center;
+      flex-wrap: wrap; gap: 1rem;
+    }
+    footer span {
+      font-size: 0.8rem;
+      color: var(--dimmer);
+    }
+
+    /* ── REVEAL ── */
+    .reveal {
+      opacity: 0;
+      transform: translateY(16px);
+      transition: opacity .45s ease, transform .45s ease;
+    }
+    .reveal.in { opacity: 1; transform: none; }
+  </style>
+</head>
+<body>
+
+<div id="prog"></div>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-inner">
+    <a href="./index.html" class="nav-back">← almutairi.xyz</a>
+    <span class="nav-title">SBL</span>
+    <span class="nav-right">2025</span>
+  </div>
+</nav>
+
+<!-- ════════════════════════════
+     PAPER HEADER
+════════════════════════════ -->
+<div id="paper-head">
+  <div class="wrap">
+    <div class="paper-meta-top">
+      <div class="paper-journal">
+        <span>RESEARCH / 01</span><br/>
+        <span>almutairi.xyz — 2025</span>
+      </div>
+      <div class="paper-journal" style="text-align:right;">
+        <span>25 citations</span><br/>
+        <span>peer-reviewed sources</span>
+      </div>
+    </div>
+
+    <h1 class="paper-title">Science-Based Lifting</h1>
+    <p class="paper-subtitle">
+      what the research actually says about building muscle —<br/>
+      no bro science, no supplements, no motivation speech.
+    </p>
+
+    <div class="paper-author-row">
+      <div class="paper-author">
+        <strong>Thamer Almutairi</strong><br/>
+        <span style="color:var(--dimmer); font-size:0.8rem;">Kuwait · 17 y/o · almutairi.xyz</span>
+      </div>
+      <div class="paper-author">
+        <span style="color:var(--dimmer); font-size:0.8rem;">Topics</span><br/>
+        <span style="font-size:0.85rem;">Hypertrophy · Biomechanics · Program Design</span>
+      </div>
+    </div>
+
+    <div class="paper-tags">
+      <span class="ptag lime">#hypertrophy</span>
+      <span class="ptag">#volume</span>
+      <span class="ptag">#frequency</span>
+      <span class="ptag">#RIR</span>
+      <span class="ptag">#progressive-overload</span>
+      <span class="ptag">#stretch-overload</span>
+      <span class="ptag">#FBEOD</span>
+      <span class="ptag">#motor-recruitment</span>
+    </div>
+
+    <div class="abstract">
+      <span class="abstract-label">Abstract</span>
+      <p>
+        i spent a while reading through peer-reviewed research on muscle hypertrophy because the advice
+        i was getting at the gym was all over the place. this page is what i found.
+        it covers the actual mechanisms of muscle growth, evidence-backed principles, exercise selection
+        per muscle group based on biomechanics, and a full FBEOD program built from the research.
+        every claim has a citation. if there's no citation, i didn't write it.
+      </p>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════
+     01 — PRINCIPLES
+════════════════════════════ -->
+<div class="sec wrap reveal">
+  <div class="sec-header">
+    <span class="sec-n">01</span>
+    <span class="sec-title">Core Principles</span>
+  </div>
+
+  <!-- MECHANICAL TENSION -->
+  <div class="fact">
+    <span class="fact-num">1.1</span>
+    <div class="fact-claim">Mechanical tension is the main driver of hypertrophy.</div>
+    <p class="prose">
+      three mechanisms are proposed for muscle growth: mechanical tension, metabolic stress, and muscle damage.
+      <strong>mechanical tension is the primary one.</strong> it's the force applied to the muscle when loaded —
+      especially in a lengthened position. the pump, the burn, the soreness — side effects, not the signal.
+      exercise selection should center on loading muscles at stretch. <span class="r">[1]</span>
+    </p>
+  </div>
+
+  <!-- VOLUME -->
+  <div class="fact">
+    <span class="fact-num">1.2</span>
+    <div class="fact-claim">Volume drives hypertrophy — with a ceiling.</div>
+    <span class="fact-stat">10 – 20</span>
+    <span style="font-size:0.8rem; color:var(--dim); letter-spacing:1px;">sets / muscle / week</span>
+    <p class="prose" style="margin-top:1rem;">
+      dose-response is real: more sets → more growth, up to a recoverable limit.
+      below ~10 sets/week per muscle you're leaving gains untouched.
+      above ~20 sets/week you're accumulating fatigue without adding stimulus.
+      <strong>10–15 sets is the practical sweet spot for most people.</strong>
+      <span class="r">[2]</span> <span class="r">[3]</span>
+    </p>
+  </div>
+
+  <!-- FREQUENCY -->
+  <div class="fact">
+    <span class="fact-num">1.3</span>
+    <div class="fact-claim">Frequency is a volume distribution tool. That's it.</div>
+    <p class="prose">
+      training a muscle 2× per week beats 1× when weekly volume is equal.
+      not because the muscle needs the signal twice — because two moderate sessions are higher quality
+      than one brutal one. <strong>2× per week is the evidence minimum. 3× is fine.</strong> <span class="r">[4]</span>
+    </p>
+  </div>
+
+  <!-- REP RANGES -->
+  <div class="fact">
+    <span class="fact-num">1.4</span>
+    <div class="fact-claim">Rep ranges don't matter as much as proximity to failure.</div>
+    <table class="mini-table">
+      <thead>
+        <tr><th>Range</th><th>Hypertrophy?</th><th>Tradeoff</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>5 – 8</td>
+          <td class="td-mid">works</td>
+          <td class="td-dim">high joint/CNS load</td>
+        </tr>
+        <tr>
+          <td>8 – 15</td>
+          <td class="td-ok">optimal</td>
+          <td class="td-dim">best effort-to-recovery ratio</td>
+        </tr>
+        <tr>
+          <td>15 – 30</td>
+          <td class="td-mid">works</td>
+          <td class="td-dim">very fatiguing mentally</td>
+        </tr>
+      </tbody>
+    </table>
+    <p class="prose" style="margin-top:1rem;">
+      hypertrophy is rep-range agnostic. what matters is <strong>effort relative to failure</strong> — not the count.
+      the "8-12 zone" is practical, not magical. <span class="r">[5]</span>
+    </p>
+  </div>
+
+  <!-- RIR -->
+  <div class="fact">
+    <span class="fact-num">1.5</span>
+    <div class="fact-claim">Stop 1–3 reps before failure, not at it.</div>
+    <p class="prose">
+      RIR = reps in reserve. <strong>RIR 1–3 produces the same hypertrophy as failure</strong>
+      with significantly less accumulated fatigue and injury risk over weeks.
+      training to failure every set kills your weekly volume capacity. <span class="r">[6]</span> <span class="r">[7]</span>
+    </p>
+    <div class="rir-rows">
+      <div class="rir-row">
+        <span class="rir-lbl" style="color:var(--red);">RIR 0</span>
+        <div class="rir-track"><div class="rir-fill" style="width:100%; background:var(--red);"></div></div>
+        <span class="rir-desc" style="color:var(--dim);">failure — not needed</span>
+      </div>
+      <div class="rir-row">
+        <span class="rir-lbl" style="color:#fa8;">RIR 1</span>
+        <div class="rir-track"><div class="rir-fill" style="width:85%; background:#fa8;"></div></div>
+        <span class="rir-desc" style="color:var(--dim);">last working rep</span>
+      </div>
+      <div class="rir-row">
+        <span class="rir-lbl" style="color:var(--lime);">RIR 2</span>
+        <div class="rir-track"><div class="rir-fill" style="width:72%; background:var(--lime);"></div></div>
+        <span class="rir-desc" style="color:var(--lime);">← target most sets</span>
+      </div>
+      <div class="rir-row">
+        <span class="rir-lbl" style="color:rgba(184,255,0,0.4);">RIR 3</span>
+        <div class="rir-track"><div class="rir-fill" style="width:58%; background:rgba(184,255,0,0.4);"></div></div>
+        <span class="rir-desc" style="color:var(--dimmer);">early sets / conservative</span>
+      </div>
+      <div class="rir-row">
+        <span class="rir-lbl" style="color:var(--dimmer);">RIR 4+</span>
+        <div class="rir-track"><div class="rir-fill" style="width:35%; background:var(--border);"></div></div>
+        <span class="rir-desc" style="color:var(--dimmer);">warm-up only</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- STRETCH -->
+  <div class="fact">
+    <span class="fact-num">1.6</span>
+    <div class="fact-claim">Stretch overload. The most underused principle.</div>
+    <p class="prose">
+      exercises that load a muscle at its <strong>longest length produce more hypertrophy per set</strong>
+      than the same exercise in a shortened position. this came out of research in the early 2020s
+      and basically changed exercise selection thinking. <span class="r">[8]</span>
+    </p>
+    <div class="callout" style="margin-top:1rem;">
+      <p class="prose">
+        incline curl > standing curl · overhead extension > pushdown ·
+        RDL > leg curl · deep squat > partial squat.
+        if two exercises train the same muscle, pick the one that stretches it more. <span class="r">[9]</span>
+      </p>
+    </div>
+  </div>
+
+  <!-- PROGRESSIVE OVERLOAD -->
+  <div class="fact">
+    <span class="fact-num">1.7</span>
+    <div class="fact-claim">Progressive overload is non-negotiable.</div>
+    <p class="prose">
+      muscles adapt to whatever load you give them. same weights every week = no growth. 
+      <strong>overload means consistently increasing the demand:</strong> more weight, more reps, better ROM.
+      rule: hit the top of your rep range for 2 sessions in a row → add 2.5 kg.
+      write your sessions down. <span class="r">[10]</span>
+    </p>
+  </div>
+</div>
+
+<!-- ════════════════════════════
+     02 — MUSCLE GUIDES
+════════════════════════════ -->
+<div class="sec wrap reveal">
+  <div class="sec-header">
+    <span class="sec-n">02</span>
+    <span class="sec-title">Exercise Selection by Muscle Group</span>
+  </div>
+  <p class="prose" style="margin-bottom:2rem;">
+    for each muscle: 2–3 exercises chosen by biomechanics, stretch position, and non-redundancy.
+    no 8-exercise chest days. <strong>selection quality beats selection quantity.</strong>
+  </p>
+
+  <!-- CHEST -->
+  <div class="muscle-block">
+    <span class="muscle-label">— chest</span>
+    <div class="muscle-name">Pectoralis Major</div>
+    <div class="muscle-grid">
+      <div class="muscle-img">
+        <img src="chest.png" alt="Chest anatomy"
+             onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"/>
+        <div class="muscle-img-placeholder" style="display:none;">
+          <span>chest.png</span>
+        </div>
+        <div class="muscle-img-cap">Clavicular + Sternal Head</div>
+      </div>
+      <div class="ex-list">
+        <div class="ex-item">
+          <div class="ex-top">
+            <span class="ex-name">1 — Incline DB/BB Press (30–45°)</span>
+            <span class="ex-type cmp">compound</span>
+          </div>
+          <p class="ex-body">
+            incline shifts emphasis to the clavicular (upper) head while still hitting the sternal head.
+            <strong>this single exercise covers most of the pec major.</strong>
+            dumbbells allow greater ROM and adduction at top. <span class="r">[11]</span>
+          </p>
+        </div>
+        <div class="ex-item">
+          <div class="ex-top">
+            <span class="ex-name">2 — Cable Fly (low-to-high)</span>
+            <span class="ex-type iso">isolation</span>
+          </div>
+          <p class="ex-body">
+            cables maintain constant tension through full ROM. low-to-high loads the pec at its
+            lengthened position. pec deck is a valid alternative.
+            <span class="r">[12]</span> <span class="r">[8]</span>
+          </p>
+        </div>
+        <div class="ex-item">
+          <div class="ex-top">
+            <span class="ex-name">why flat bench is mostly redundant</span>
+            <span class="ex-type" style="color:var(--dim);">context</span>
+          </div>
+          <p class="ex-body">
+            flat bench loads the sternal head — already covered by incline at 30-45°.
+            adding flat bench on top of incline + fly duplicates stimulus and adds shoulder impingement risk.
+            keep it if you compete in powerlifting. otherwise, skip it. <span class="r">[11]</span>
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- BACK -->
+  <div class="muscle-block">
+    <span class="muscle-label">— back</span>
+    <div class="muscle-name">Latissimus Dorsi + Mid Traps + Rhomboids</div>
+    <div class="muscle-grid">
+      <div class="muscle-img">
+        <img src="back.png" alt="Back anatomy"
+             onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"/>
+        <div class="muscle-img-placeholder" style="display:none;"><span>back.png</span></div>
+        <div class="muscle-img-cap">Lats · Mid Traps · Rhomboids</div>
+      </div>
+      <div class="ex-list">
+        <div class="ex-item">
+          <div class="ex-top">
+            <span class="ex-name">1 — Pull-Up or Lat Pulldown</span>
+            <span class="ex-type cmp">compound</span>
+          </div>
+          <p class="ex-body">
+            vertical pull for lat width. shoulder-width grip maximises lat stretch at the top.
+            pull-up and pulldown are equivalent for lat hypertrophy — use whichever lets you load progressively.
+            <span class="r">[13]</span>
+          </p>
+        </div>
+        <div class="ex-item">
+          <div class="ex-top">
+            <span class="ex-name">2 — Chest-Supported Row or Cable Row</span>
+            <span class="ex-type cmp">compound</span>
+          </div>
+          <p class="ex-body">
+            horizontal pull for mid-back thickness. chest-supported removes lower back fatigue —
+            important if you're also squatting and deadlifting the same week. <span class="r">[14]</span>
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SHOULDERS -->
+  <div class="muscle-block">
+    <span class="muscle-label">— shoulders</span>
+    <div class="muscle-name">Deltoids — 3 heads, 3 different movements</div>
+    <div class="muscle-grid">
+      <div class="muscle-img">
+        <img src="shoulders.png" alt="Shoulder anatomy"
+             onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"/>
+        <div class="muscle-img-placeholder" style="display:none;"><span>shoulders.png</span></div>
+        <div class="muscle-img-cap">Anterior · Lateral · Posterior Head</div>
+      </div>
+      <div class="ex-list">
+        <div class="ex-item">
+          <div class="ex-top">
+            <span class="ex-name">1 — Overhead Press (DB or BB)</span>
+            <span class="ex-type cmp">compound</span>
+          </div>
+          <p class="ex-body">
+            most efficient shoulder exercise. anterior and lateral heads under heavy load simultaneously.
+            note: <strong>anterior delt is already getting volume from pressing</strong> (incline, bench) —
+            OHP mainly justifies itself here for lateral head and total shoulder mass. <span class="r">[15]</span>
+          </p>
+        </div>
+        <div class="ex-item">
+          <div class="ex-top">
+            <span class="ex-name">2 — Cable Lateral Raise</span>
+            <span class="ex-type iso">isolation</span>
+          </div>
+          <p class="ex-body">
+            shoulder width = lateral head. cable keeps tension at the bottom (muscle stretched),
+            unlike dumbbells where tension drops to zero at your side. <span class="r">[16]</span>
+          </p>
+        </div>
+        <div class="ex-item">
+          <div class="ex-top">
+            <span class="ex-name">3 — Rear Delt Fly (cable or pec deck reversed)</span>
+            <span class="ex-type iso">isolation</span>
+          </div>
+          <p class="ex-body">
+            posterior delt is almost never hit enough. presses and rows don't isolate it.
+            required for shoulder balance and long-term joint health. <span class="r">[17]</span>
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ARMS -->
+  <div class="muscle-block">
+    <span class="muscle-label">— arms</span>
+    <div class="muscle-name">Biceps + Brachialis + Triceps Long Head</div>
+    <div class="muscle-grid">
+      <div class="muscle-img">
+        <img src="arms.png" alt="Arm anatomy"
+             onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"/>
+        <div class="muscle-img-placeholder" style="display:none;"><span>arms.png</span></div>
+        <div class="muscle-img-cap">Biceps · Brachialis · Triceps (3 heads)</div>
+      </div>
+      <div class="ex-list">
+        <div class="ex-item">
+          <div class="ex-top">
+            <span class="ex-name">1 — Incline DB Curl</span>
+            <span class="ex-type iso">isolation</span>
+          </div>
+          <p class="ex-body">
+            arm hangs behind the torso → biceps long head loaded at its longest length.
+            <strong>probably the single most effective bicep exercise</strong> based on stretch-mediated
+            hypertrophy research. creates the peak. <span class="r">[8]</span> <span class="r">[18]</span>
+          </p>
+        </div>
+        <div class="ex-item">
+          <div class="ex-top">
+            <span class="ex-name">2 — Hammer Curl</span>
+            <span class="ex-type iso">isolation</span>
+          </div>
+          <p class="ex-body">
+            neutral grip shifts load from biceps to brachialis. brachialis sits under the bicep —
+            growing it physically pushes the bicep up, increasing arm peak height. <span class="r">[18]</span>
+          </p>
+        </div>
+        <div class="ex-item">
+          <div class="ex-top">
+            <span class="ex-name">3 — Overhead Cable Extension</span>
+            <span class="ex-type iso">isolation</span>
+          </div>
+          <p class="ex-body">
+            triceps long head is ~55% of total tricep mass. it's only fully lengthened with arms overhead.
+            <strong>pushdowns don't stretch the long head at all.</strong>
+            if you only do pushdowns you're building the smaller heads. <span class="r">[8]</span> <span class="r">[19]</span>
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- LEGS -->
+  <div class="muscle-block">
+    <span class="muscle-label">— legs</span>
+    <div class="muscle-name">Quads + Hamstrings + Calves</div>
+    <div class="muscle-grid">
+      <div class="muscle-img">
+        <img src="legs.png" alt="Leg anatomy"
+             onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"/>
+        <div class="muscle-img-placeholder" style="display:none;"><span>legs.png</span></div>
+        <div class="muscle-img-cap">Quads · Hamstrings · Gastroc · Soleus</div>
+      </div>
+      <div class="ex-list">
+        <div class="ex-item">
+          <div class="ex-top">
+            <span class="ex-name">1 — Squat or Hack Squat</span>
+            <span class="ex-type cmp">compound</span>
+          </div>
+          <p class="ex-body">
+            deep squats (below parallel) load all 4 quad heads at a longer length than partial squats.
+            research shows significantly greater quad hypertrophy with full depth. full ROM every rep. <span class="r">[20]</span>
+          </p>
+        </div>
+        <div class="ex-item">
+          <div class="ex-top">
+            <span class="ex-name">2 — Romanian Deadlift</span>
+            <span class="ex-type cmp">compound</span>
+          </div>
+          <p class="ex-body">
+            gold standard hamstring exercise. loads hamstrings in a stretched position —
+            consistently outperforms leg curl for growth, especially biceps femoris long head.
+            feel the stretch, not the pump. <span class="r">[21]</span>
+          </p>
+        </div>
+        <div class="ex-item">
+          <div class="ex-top">
+            <span class="ex-name">3 — Leg Extension</span>
+            <span class="ex-type iso">isolation</span>
+          </div>
+          <p class="ex-body">
+            rectus femoris is the only quad head that crosses both hip and knee.
+            during squats your hip is flexed → rectus is shortened → can't be fully loaded.
+            <strong>leg extension is the only exercise that fully trains it.</strong> <span class="r">[22]</span>
+          </p>
+        </div>
+        <div class="ex-item">
+          <div class="ex-top">
+            <span class="ex-name">4 — Standing Calf Raise</span>
+            <span class="ex-type iso">isolation</span>
+          </div>
+          <p class="ex-body">
+            calves aren't hit enough by compound work to grow. standing targets gastrocnemius,
+            seated targets soleus. full ROM — heel below the platform — is critical.
+            15–25 reps suits slow-twitch dominant fibers. <span class="r">[23]</span>
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════
+     03 — PROGRAM
+════════════════════════════ -->
+<div class="sec wrap reveal">
+  <div class="sec-header">
+    <span class="sec-n">03</span>
+    <span class="sec-title">FBEOD Program</span>
+  </div>
+
+  <p class="prose" style="margin-bottom:1rem;">
+    full body, every other day. two workouts (A and B) alternated.
+    week 1: A/B/A. week 2: B/A/B. every muscle hits 3× per week.
+    rest days between sessions are not optional — that's when growth happens. <span class="r">[24]</span>
+  </p>
+  <p class="prose" style="margin-bottom:2rem;">
+    <strong>session length: 60–75 min.</strong> rest 2–3 min between compound sets, 90s between isolation sets.
+  </p>
+
+  <div style="font-size:0.7rem; color:var(--dimmer); letter-spacing:1px; text-transform:uppercase; margin-bottom:0.4rem;">Week 1</div>
+  <div class="week-grid">
+    <div class="wd"><span class="wd-name">Mon</span><span class="wd-val wd-a">A</span></div>
+    <div class="wd"><span class="wd-name">Tue</span><span class="wd-val wd-off">—</span></div>
+    <div class="wd"><span class="wd-name">Wed</span><span class="wd-val wd-b">B</span></div>
+    <div class="wd"><span class="wd-name">Thu</span><span class="wd-val wd-off">—</span></div>
+    <div class="wd"><span class="wd-name">Fri</span><span class="wd-val wd-a">A</span></div>
+    <div class="wd"><span class="wd-name">Sat</span><span class="wd-val wd-off">—</span></div>
+    <div class="wd"><span class="wd-name">Sun</span><span class="wd-val wd-off">—</span></div>
+  </div>
+
+  <div style="font-size:0.7rem; color:var(--dimmer); letter-spacing:1px; text-transform:uppercase; margin-bottom:0.4rem; margin-top:1rem;">Week 2</div>
+  <div class="week-grid">
+    <div class="wd"><span class="wd-name">Mon</span><span class="wd-val wd-b">B</span></div>
+    <div class="wd"><span class="wd-name">Tue</span><span class="wd-val wd-off">—</span></div>
+    <div class="wd"><span class="wd-name">Wed</span><span class="wd-val wd-a">A</span></div>
+    <div class="wd"><span class="wd-name">Thu</span><span class="wd-val wd-off">—</span></div>
+    <div class="wd"><span class="wd-name">Fri</span><span class="wd-val wd-b">B</span></div>
+    <div class="wd"><span class="wd-name">Sat</span><span class="wd-val wd-off">—</span></div>
+    <div class="wd"><span class="wd-name">Sun</span><span class="wd-val wd-off">—</span></div>
+  </div>
+
+  <!-- Workout A -->
+  <span class="prog-label a">— Workout A</span>
+  <table class="prog">
+    <thead>
+      <tr>
+        <th>#</th><th>Exercise</th><th>Sets</th><th>Reps</th><th>RIR</th><th>Coaching note</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td class="t-n">01</td>
+        <td><span class="t-ex">Squat</span> <em style="font-size:.75rem; color:var(--dimmer);">or Hack Squat</em></td>
+        <td class="t-sets">3 sets</td><td class="t-sets">6–10</td><td class="t-rir">2</td>
+        <td class="t-note">Full depth. Control the negative. Heels elevated on plates if ankles restrict depth.</td>
+      </tr>
+      <tr>
+        <td class="t-n">02</td>
+        <td><span class="t-ex">Incline DB Press</span> <em style="font-size:.75rem; color:var(--dimmer);">30–45°</em></td>
+        <td class="t-sets">3 sets</td><td class="t-sets">8–12</td><td class="t-rir">2</td>
+        <td class="t-note">Elbows ~75° from torso. Big stretch at the bottom. Don't flare.</td>
+      </tr>
+      <tr>
+        <td class="t-n">03</td>
+        <td><span class="t-ex">Lat Pulldown</span> <em style="font-size:.75rem; color:var(--dimmer);">or Pull-Up</em></td>
+        <td class="t-sets">3 sets</td><td class="t-sets">6–10</td><td class="t-rir">2</td>
+        <td class="t-note">Full stretch at the top. Neutral or shoulder-width grip. No kipping.</td>
+      </tr>
+      <tr>
+        <td class="t-n">04</td>
+        <td><span class="t-ex">Romanian Deadlift</span></td>
+        <td class="t-sets">3 sets</td><td class="t-sets">8–12</td><td class="t-rir">2</td>
+        <td class="t-note">Push hips back, feel the hamstring stretch. Bar stays close to legs.</td>
+      </tr>
+      <tr>
+        <td class="t-n">05</td>
+        <td><span class="t-ex">Overhead Cable Extension</span> <em style="font-size:.75rem; color:var(--dimmer);">rope</em></td>
+        <td class="t-sets">3 sets</td><td class="t-sets">10–15</td><td class="t-rir">2</td>
+        <td class="t-note">Arms fully overhead. Full stretch. Slow eccentric.</td>
+      </tr>
+      <tr>
+        <td class="t-n">06</td>
+        <td><span class="t-ex">Incline DB Curl</span></td>
+        <td class="t-sets">3 sets</td><td class="t-sets">10–15</td><td class="t-rir">2</td>
+        <td class="t-note">Arm hangs behind torso. No swinging. Slow negative.</td>
+      </tr>
+      <tr>
+        <td class="t-n">07</td>
+        <td><span class="t-ex">Cable Lateral Raise</span></td>
+        <td class="t-sets">3 sets</td><td class="t-sets">12–15</td><td class="t-rir">2</td>
+        <td class="t-note">Slight forward lean. Lead with elbow. Full ROM down.</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <!-- Workout B -->
+  <span class="prog-label b" style="margin-top:2.5rem;">— Workout B</span>
+  <table class="prog">
+    <thead>
+      <tr>
+        <th>#</th><th>Exercise</th><th>Sets</th><th>Reps</th><th>RIR</th><th>Coaching note</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td class="t-n">01</td>
+        <td><span class="t-ex">Overhead Press</span> <em style="font-size:.75rem; color:var(--dimmer);">DB or BB</em></td>
+        <td class="t-sets">3 sets</td><td class="t-sets">8–12</td><td class="t-rir">2</td>
+        <td class="t-note">Strict form. Don't turn it into a push press. Full lockout.</td>
+      </tr>
+      <tr>
+        <td class="t-n">02</td>
+        <td><span class="t-ex">Chest-Supported Row</span></td>
+        <td class="t-sets">3 sets</td><td class="t-sets">8–12</td><td class="t-rir">2</td>
+        <td class="t-note">Full stretch forward. Retract scapula at peak. No torso swinging.</td>
+      </tr>
+      <tr>
+        <td class="t-n">03</td>
+        <td><span class="t-ex">Leg Press</span></td>
+        <td class="t-sets">3 sets</td><td class="t-sets">10–15</td><td class="t-rir">2</td>
+        <td class="t-note">Full depth. Don't lock knees out. Feet shoulder-width.</td>
+      </tr>
+      <tr>
+        <td class="t-n">04</td>
+        <td><span class="t-ex">Cable Fly</span> <em style="font-size:.75rem; color:var(--dimmer);">low-to-high</em></td>
+        <td class="t-sets">3 sets</td><td class="t-sets">12–15</td><td class="t-rir">2</td>
+        <td class="t-note">Slight forward lean. Big stretch at bottom. Don't touch hands at top.</td>
+      </tr>
+      <tr>
+        <td class="t-n">05</td>
+        <td><span class="t-ex">Leg Extension</span></td>
+        <td class="t-sets">3 sets</td><td class="t-sets">12–15</td><td class="t-rir">2</td>
+        <td class="t-note">Pause at full extension. Control the eccentric.</td>
+      </tr>
+      <tr>
+        <td class="t-n">06</td>
+        <td><span class="t-ex">Hammer Curl</span></td>
+        <td class="t-sets">3 sets</td><td class="t-sets">12–15</td><td class="t-rir">2</td>
+        <td class="t-note">Neutral grip throughout. No body English.</td>
+      </tr>
+      <tr>
+        <td class="t-n">07</td>
+        <td><span class="t-ex">Rear Delt Fly</span> <em style="font-size:.75rem; color:var(--dimmer);">cable or pec deck</em></td>
+        <td class="t-sets">3 sets</td><td class="t-sets">12–15</td><td class="t-rir">2</td>
+        <td class="t-note">Lead with elbows. Full stretch forward.</td>
+      </tr>
+      <tr>
+        <td class="t-n">08</td>
+        <td><span class="t-ex">Standing Calf Raise</span></td>
+        <td class="t-sets">3 sets</td><td class="t-sets">15–20</td><td class="t-rir">2</td>
+        <td class="t-note">Heel below the step. Full ROM. Pause at top and bottom.</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <!-- Volume -->
+  <div style="font-size:0.7rem; color:var(--dimmer); letter-spacing:1px; text-transform:uppercase; margin-top:2.5rem; margin-bottom:0.25rem;">
+    weekly volume / muscle (averaged across both weeks)
+  </div>
+  <div class="vol-rows">
+    <div class="vol-row"><span class="vol-m">Chest</span><div class="vol-bg"><div class="vol-fill" style="width:75%;"></div></div><span class="vol-n">~9 sets</span></div>
+    <div class="vol-row"><span class="vol-m">Back</span><div class="vol-bg"><div class="vol-fill" style="width:75%;"></div></div><span class="vol-n">~9 sets</span></div>
+    <div class="vol-row"><span class="vol-m">Quads</span><div class="vol-bg"><div class="vol-fill" style="width:100%;"></div></div><span class="vol-n">~12 sets</span></div>
+    <div class="vol-row"><span class="vol-m">Hamstrings</span><div class="vol-bg"><div class="vol-fill" style="width:58%;"></div></div><span class="vol-n">~7 sets</span></div>
+    <div class="vol-row"><span class="vol-m">Shoulders</span><div class="vol-bg"><div class="vol-fill" style="width:75%;"></div></div><span class="vol-n">~9 sets</span></div>
+    <div class="vol-row"><span class="vol-m">Biceps</span><div class="vol-bg"><div class="vol-fill" style="width:55%;"></div></div><span class="vol-n">~7 sets</span></div>
+    <div class="vol-row"><span class="vol-m">Triceps</span><div class="vol-bg"><div class="vol-fill" style="width:55%;"></div></div><span class="vol-n">~7 sets*</span></div>
+    <div class="vol-row"><span class="vol-m">Calves</span><div class="vol-bg"><div class="vol-fill" style="width:40%;"></div></div><span class="vol-n">~5 sets</span></div>
+  </div>
+  <p class="prose" style="font-size:0.78rem; margin-top:0.5rem;">* triceps get indirect volume from all pressing — effective total is higher.</p>
+
+  <div class="overload-box">
+    <span class="ob-label">Progressive Overload Rule</span>
+    <p>
+      track every session. write weight × reps for each set.
+      when you hit the top of your rep range for 2 sessions in a row — add 2.5 kg.
+      if you can't hit the bottom of the range, stay at the weight. no ego lifting.
+      <span class="r">[10]</span>
+    </p>
+    <p>
+      every 8–10 weeks: one deload week. same exercises, 50% volume, RIR 4–5.
+      connective tissue needs this. you'll come back stronger after.
+    </p>
+  </div>
+</div>
+
+<!-- ════════════════════════════
+     04 — MYTHS
+════════════════════════════ -->
+<div class="sec wrap reveal">
+  <div class="sec-header">
+    <span class="sec-n">04</span>
+    <span class="sec-title">Myth vs Fact</span>
+  </div>
+
+  <div class="myth-block">
+    <div class="myth-inner">
+      <div class="myth-cell x"><span class="myth-mk x">✕ myth</span>"Train to failure every set to maximize growth."</div>
+      <div class="myth-cell ok"><span class="myth-mk ok">✓ fact</span>RIR 1–3 produces <strong>the same hypertrophy as failure</strong>. going to failure every set kills weekly volume capacity. <span class="r">[6]</span></div>
+    </div>
+  </div>
+  <div class="myth-block">
+    <div class="myth-inner">
+      <div class="myth-cell x"><span class="myth-mk x">✕ myth</span>"More exercises per muscle = more growth."</div>
+      <div class="myth-cell ok"><span class="myth-mk ok">✓ fact</span>2–3 well-chosen exercises cover a muscle efficiently. past the volume ceiling you're adding fatigue, not stimulus. <span class="r">[3]</span></div>
+    </div>
+  </div>
+  <div class="myth-block">
+    <div class="myth-inner">
+      <div class="myth-cell x"><span class="myth-mk x">✕ myth</span>"Switch exercises constantly — muscle confusion."</div>
+      <div class="myth-cell ok"><span class="myth-mk ok">✓ fact</span>muscles don't get confused. <strong>consistent exercises let you track progressive overload</strong>, which is the actual driver. random rotation makes progression impossible. <span class="r">[10]</span></div>
+    </div>
+  </div>
+  <div class="myth-block">
+    <div class="myth-inner">
+      <div class="myth-cell x"><span class="myth-mk x">✕ myth</span>"Light weight + high reps = toning. Heavy = bulking."</div>
+      <div class="myth-cell ok"><span class="myth-mk ok">✓ fact</span>"toning" = muscle + lower body fat. hypertrophy occurs across all rep ranges when effort is close to failure. this is marketing language, not physiology. <span class="r">[5]</span></div>
+    </div>
+  </div>
+  <div class="myth-block">
+    <div class="myth-inner">
+      <div class="myth-cell x"><span class="myth-mk x">✕ myth</span>"DOMS = good workout. No soreness = no gains."</div>
+      <div class="myth-cell ok"><span class="myth-mk ok">✓ fact</span>DOMS is eccentric muscle damage from unfamiliar stimulus. it does <strong>not correlate with hypertrophy</strong>. well-trained muscles barely get sore but keep adapting. <span class="r">[1]</span></div>
+    </div>
+  </div>
+  <div class="myth-block">
+    <div class="myth-inner">
+      <div class="myth-cell x"><span class="myth-mk x">✕ myth</span>"Eat protein within 30 min post-workout or you lose gains."</div>
+      <div class="myth-cell ok"><span class="myth-mk ok">✓ fact</span>the anabolic window is much wider than claimed. <strong>1.6–2.2 g/kg/day total protein</strong> matters far more than timing. <span class="r">[25]</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════
+     05 — REFERENCES
+════════════════════════════ -->
+<div class="sec wrap reveal">
+  <div class="sec-header">
+    <span class="sec-n">05</span>
+    <span class="sec-title">References</span>
+  </div>
+
+  <div class="ref-list">
+    <div class="ref-entry"><span class="ref-n">[1]</span><span class="ref-text">Schoenfeld BJ. "The mechanisms of muscle hypertrophy and their application to resistance training." <em>J Strength Cond Res.</em> 2010;24(10):2857-72. <a href="https://pubmed.ncbi.nlm.nih.gov/20847704/" target="_blank">pubmed</a></span></div>
+    <div class="ref-entry"><span class="ref-n">[2]</span><span class="ref-text">Krieger JW. "Single vs. multiple sets of resistance exercise for muscle hypertrophy: a meta-analysis." <em>J Strength Cond Res.</em> 2010;24(4):1150-59. <a href="https://pubmed.ncbi.nlm.nih.gov/20300012/" target="_blank">pubmed</a></span></div>
+    <div class="ref-entry"><span class="ref-n">[3]</span><span class="ref-text">Schoenfeld BJ, Ogborn D, Krieger JW. "Dose-response relationship between weekly resistance training volume and increases in muscle mass." <em>J Sports Sci.</em> 2017;35(11):1073-82. <a href="https://pubmed.ncbi.nlm.nih.gov/27433992/" target="_blank">pubmed</a></span></div>
+    <div class="ref-entry"><span class="ref-n">[4]</span><span class="ref-text">Schoenfeld BJ, Ogborn D, Krieger JW. "Effects of Resistance Training Frequency on Measures of Muscle Hypertrophy." <em>Sports Med.</em> 2016;46(11):1689-97. <a href="https://pubmed.ncbi.nlm.nih.gov/27102172/" target="_blank">pubmed</a></span></div>
+    <div class="ref-entry"><span class="ref-n">[5]</span><span class="ref-text">Schoenfeld BJ, et al. "Strength and Hypertrophy Adaptations Between Low- vs. High-Load Resistance Training." <em>J Strength Cond Res.</em> 2017;31(12):3508-23. <a href="https://pubmed.ncbi.nlm.nih.gov/28834797/" target="_blank">pubmed</a></span></div>
+    <div class="ref-entry"><span class="ref-n">[6]</span><span class="ref-text">Refalo MC, et al. "Influence of Resistance Training Proximity-to-Failure on Skeletal Muscle Hypertrophy." <em>J Sci Med Sport.</em> 2023;26(1):58-66. <a href="https://pubmed.ncbi.nlm.nih.gov/36370660/" target="_blank">pubmed</a></span></div>
+    <div class="ref-entry"><span class="ref-n">[7]</span><span class="ref-text">Helms ER, et al. "Application of the Repetitions in Reserve-Based Rating of Perceived Exertion Scale." <em>Strength Cond J.</em> 2016;38(4):42-49.</span></div>
+    <div class="ref-entry"><span class="ref-n">[8]</span><span class="ref-text">Maeo S, et al. "Greater Hamstrings Muscle Hypertrophy but Similar Damage Protection after Training at Long versus Short Muscle Lengths." <em>Med Sci Sports Exerc.</em> 2021;53(4):825-37. <a href="https://pubmed.ncbi.nlm.nih.gov/33009197/" target="_blank">pubmed</a></span></div>
+    <div class="ref-entry"><span class="ref-n">[9]</span><span class="ref-text">McMahon GE, et al. "Impact of range of motion during ecologically valid resistance training protocols on muscle size, subcutaneous fat, and strength." <em>J Strength Cond Res.</em> 2014;28(1):245-55. <a href="https://pubmed.ncbi.nlm.nih.gov/23629583/" target="_blank">pubmed</a></span></div>
+    <div class="ref-entry"><span class="ref-n">[10]</span><span class="ref-text">American College of Sports Medicine. "Progression Models in Resistance Training for Healthy Adults." <em>Med Sci Sports Exerc.</em> 2009;41(3):687-708. <a href="https://pubmed.ncbi.nlm.nih.gov/19204579/" target="_blank">pubmed</a></span></div>
+    <div class="ref-entry"><span class="ref-n">[11]</span><span class="ref-text">Lauver JD, et al. "Influence of bench angle on upper extremity muscular activation during bench press." <em>Eur J Sport Sci.</em> 2016;16(3):309-16. <a href="https://pubmed.ncbi.nlm.nih.gov/25959468/" target="_blank">pubmed</a></span></div>
+    <div class="ref-entry"><span class="ref-n">[12]</span><span class="ref-text">Gentil P, et al. "Effect of adding single-joint exercises to a multi-joint resistance-training program." <em>Asian J Sports Med.</em> 2015;6(2):e24057. <a href="https://pubmed.ncbi.nlm.nih.gov/26446299/" target="_blank">pubmed</a></span></div>
+    <div class="ref-entry"><span class="ref-n">[13]</span><span class="ref-text">Andersen V, et al. "Effects of grip width on muscle strength and activation in the lat pull-down." <em>J Strength Cond Res.</em> 2014;28(4):1135-42. <a href="https://pubmed.ncbi.nlm.nih.gov/24662157/" target="_blank">pubmed</a></span></div>
+    <div class="ref-entry"><span class="ref-n">[14]</span><span class="ref-text">Fenwick CMJ, et al. "Comparison of different rowing exercises: trunk muscle activation and lumbar spine motion." <em>J Strength Cond Res.</em> 2009;23(2):350-58. <a href="https://pubmed.ncbi.nlm.nih.gov/19197204/" target="_blank">pubmed</a></span></div>
+    <div class="ref-entry"><span class="ref-n">[15]</span><span class="ref-text">Saeterbakken AH, Fimland MS. "Effects of body position and loading modality on muscle activity in shoulder presses." <em>J Strength Cond Res.</em> 2013;27(7):1824-31. <a href="https://pubmed.ncbi.nlm.nih.gov/23096062/" target="_blank">pubmed</a></span></div>
+    <div class="ref-entry"><span class="ref-n">[16]</span><span class="ref-text">Coratella G, et al. "Front vs. Rear-Deltoid Activation in Shoulder Press and Raises." <em>J Hum Kinet.</em> 2020;74:19-28. <a href="https://pubmed.ncbi.nlm.nih.gov/33312245/" target="_blank">pubmed</a></span></div>
+    <div class="ref-entry"><span class="ref-n">[17]</span><span class="ref-text">Pizzari T, et al. "Modifying a shrug exercise can facilitate the upward rotator muscles of the scapula." <em>Clin Biomech.</em> 2014;29(2):201-05. <a href="https://pubmed.ncbi.nlm.nih.gov/24290924/" target="_blank">pubmed</a></span></div>
+    <div class="ref-entry"><span class="ref-n">[18]</span><span class="ref-text">Oliveira LF, et al. "Effect of the shoulder position on the biceps brachii EMG in different dumbbell curls." <em>J Sports Sci Med.</em> 2009;8(1):24-29.</span></div>
+    <div class="ref-entry"><span class="ref-n">[19]</span><span class="ref-text">Kassiano W, et al. "Greater Gastrocnemius Muscle Hypertrophy After Partial Range of Eccentric Contractions at Long Versus Short Muscle Lengths." <em>J Strength Cond Res.</em> 2023;37(9):1919-28. <a href="https://pubmed.ncbi.nlm.nih.gov/36696305/" target="_blank">pubmed</a></span></div>
+    <div class="ref-entry"><span class="ref-n">[20]</span><span class="ref-text">Bloomquist K, et al. "Effect of range of motion in heavy load squatting on muscle and tendon adaptations." <em>Eur J Appl Physiol.</em> 2013;113(8):2133-42. <a href="https://pubmed.ncbi.nlm.nih.gov/23604798/" target="_blank">pubmed</a></span></div>
+    <div class="ref-entry"><span class="ref-n">[21]</span><span class="ref-text">Bourne MN, et al. "Impact of the Nordic hamstring and hip extension exercises on hamstring architecture and morphology." <em>Br J Sports Med.</em> 2017;51(5):469-77. <a href="https://pubmed.ncbi.nlm.nih.gov/27288526/" target="_blank">pubmed</a></span></div>
+    <div class="ref-entry"><span class="ref-n">[22]</span><span class="ref-text">Swinton PA, et al. "A biomechanical comparison of the traditional squat, powerlifting squat, and box squat." <em>J Strength Cond Res.</em> 2012;26(7):1805-16.</span></div>
+    <div class="ref-entry"><span class="ref-n">[23]</span><span class="ref-text">Riemann BL, et al. "Medial and lateral gastrocnemius activation differences during heel-raise exercise." <em>J Strength Cond Res.</em> 2011;25(3):634-39. <a href="https://pubmed.ncbi.nlm.nih.gov/21399533/" target="_blank">pubmed</a></span></div>
+    <div class="ref-entry"><span class="ref-n">[24]</span><span class="ref-text">Tang JE, et al. "Resistance training alters the response of fed state mixed muscle protein synthesis in young men." <em>Am J Physiol.</em> 2008;294(1):R172-8.</span></div>
+    <div class="ref-entry"><span class="ref-n">[25]</span><span class="ref-text">Schoenfeld BJ, Aragon AA. "Is There a Postworkout Anabolic Window of Opportunity for Nutrient Consumption?" <em>J Orthop Sports Phys Ther.</em> 2018;48(12):911-14. <a href="https://pubmed.ncbi.nlm.nih.gov/30702985/" target="_blank">pubmed</a></span></div>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <div class="foot-inner">
+    <span>Thamer Almutairi · <a href="./index.html" style="color:var(--dimmer);">almutairi.xyz</a></span>
+    <span>not medical advice · no ads · no supplements</span>
+  </div>
+</footer>
+
+<script>
+  // scroll progress
+  window.addEventListener('scroll', () => {
+    const p = window.scrollY / (document.body.scrollHeight - window.innerHeight) * 100;
+    document.getElementById('prog').style.width = p + '%';
+  }, { passive: true });
+
+  // reveal
+  const ro = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) { e.target.classList.add('in'); ro.unobserve(e.target); }
+    });
+  }, { threshold: 0.06, rootMargin: '0px 0px -30px 0px' });
+  document.querySelectorAll('.reveal').forEach(el => ro.observe(el));
+</script>
+</body>
+</html>
