@@ -6,7 +6,7 @@
     <title>Thamer Almutairi</title>
     <link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet">
     <style>
-:root {
+        :root {
             --bg: #000;
             --text: #7a7a7a;
             --accent: #d1d1d1;
@@ -16,12 +16,7 @@
 
         * { box-sizing: border-box; margin: 0; padding: 0; cursor: crosshair; }
 
-/* FIX: Reset entirely, no hidden overflow */
-        html, body {
-            margin: 0;
-            padding: 0;
-            min-height: 100vh;
-        }
+        html, body { margin: 0; padding: 0; min-height: 100vh; }
 
         body {
             background: var(--bg);
@@ -30,36 +25,36 @@
             font-size: 1.3rem;
             line-height: 1.4;
             padding: 5rem 1.5rem;
-            /* FIX: 'clip' hides horizontal overflow WITHOUT breaking native touch scrolling */
-            overflow-x: clip; 
+            overflow-x: clip;
             overflow-y: visible;
         }
 
-        /* Scanlines Effect */
+        /* Scanlines */
         body::before {
             content: "";
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
-            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.1) 50%), 
-                        linear-gradient(90deg, rgba(255, 0, 0, 0.02), rgba(0, 255, 0, 0.01), rgba(0, 0, 255, 0.02));
+            background:
+                linear-gradient(rgba(18,16,16,0) 50%, rgba(0,0,0,0.1) 50%),
+                linear-gradient(90deg, rgba(255,0,0,0.02), rgba(0,255,0,0.01), rgba(0,0,255,0.02));
             background-size: 100% 3px, 3px 100%;
             pointer-events: none;
             z-index: 100;
         }
 
-        /* FIX: Added padding-bottom so you have room to scroll past the last link */
-        main { 
-            max-width: 500px; 
-            margin: 0 auto; 
-            position: relative; 
-            z-index: 10; 
-            padding-bottom: 4rem; 
+        main {
+            max-width: 500px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 10;
+            padding-bottom: 6rem;
         }
 
+        /* HEADER */
         header {
             display: flex;
             justify-content: space-between;
-            align-items: center;
+            align-items: flex-start;
             margin-bottom: 3rem;
         }
 
@@ -72,14 +67,35 @@
             border: 1px solid var(--border);
         }
 
-        section { margin-bottom: 2rem; }
-        
+        /* SECTION LABEL */
+        .section-label {
+            color: #444;
+            font-size: 0.8rem;
+            text-transform: lowercase;
+            margin-bottom: 0.8rem;
+            border-bottom: 1px solid var(--border);
+            display: inline-block;
+            padding-bottom: 2px;
+        }
+
+        section { margin-bottom: 2.5rem; }
         p { margin-bottom: 1rem; color: #555; }
         strong { color: var(--accent); font-weight: normal; }
 
-        /* Links Section */
+        /* CERTS */
+        .certs { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 5px; }
+        .cert-tag {
+            border: 1px solid var(--border);
+            padding: 2px 6px;
+            font-size: 0.8rem;
+            color: #555;
+            transition: color .2s, border-color .2s;
+        }
+        .cert-tag:hover { color: var(--accent); border-color: #333; }
+
+        /* LINKS */
         .links { display: flex; flex-direction: column; gap: 10px; }
-        
+
         .link-item {
             text-decoration: none;
             color: var(--text);
@@ -88,120 +104,196 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            transition: 0.2s;
+            transition: background .2s, color .2s, border-color .2s;
         }
-        
-        .link-item:hover { 
-            background: rgba(255, 255, 255, 0.03); 
-            color: var(--accent); 
-        }
-
-        /* Icon & Text Wrapper */
-        .link-left {
-            display: flex;
-            align-items: center;
-            gap: 12px;
+        .link-item:hover {
+            background: rgba(255,255,255,0.03);
+            color: var(--accent);
+            border-color: #2a2a2a;
         }
 
-        /* Pixel Art SVGs */
+        .link-left { display: flex; align-items: center; gap: 12px; }
+
         .pixel-icon {
-            width: 18px;
-            height: 18px;
+            width: 18px; height: 18px;
             fill: currentColor;
             shape-rendering: crispEdges;
         }
 
-        .click-anywhere {
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.9);
+        /* RESEARCH */
+        .research-grid {
+            border: 1px solid var(--border);
             display: flex;
-            justify-content: center;
-            align-items: center;
-            z-index: 1000;
-            color: var(--accent);
-            cursor: pointer;
+            flex-direction: column;
         }
-</style>
+
+        .research-item {
+            text-decoration: none;
+            display: flex;
+            align-items: stretch;
+            border-bottom: 1px solid var(--border);
+            position: relative;
+            overflow: hidden;
+            transition: background .2s;
+        }
+        .research-item:last-child { border-bottom: none; }
+        .research-item:hover { background: rgba(255,255,255,0.02); }
+
+        .research-num {
+            font-size: 0.72rem;
+            color: #2a2a2a;
+            padding: 16px 14px;
+            border-right: 1px solid var(--border);
+            display: flex;
+            align-items: flex-start;
+            min-width: 42px;
+            flex-shrink: 0;
+        }
+
+        .research-body { padding: 14px 16px; flex: 1; }
+
+        .research-title {
+            color: var(--accent);
+            font-size: 1.15rem;
+            display: block;
+            margin-bottom: 4px;
+            transition: color .2s;
+        }
+        .research-item:hover .research-title { color: #fff; }
+
+        .research-sub {
+            font-size: 0.72rem;
+            color: #333;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .r-tag {
+            border: 1px solid #1c1c1c;
+            padding: 1px 5px;
+            font-size: 0.65rem;
+            color: #363636;
+        }
+
+        .research-arrow {
+            display: flex;
+            align-items: center;
+            padding: 14px 14px;
+            color: #282828;
+            font-size: 1.1rem;
+            flex-shrink: 0;
+            transition: color .2s;
+        }
+        .research-item:hover .research-arrow { color: #666; }
+
+        .research-item.wip {
+            opacity: 0.35;
+            pointer-events: none;
+        }
+    </style>
 </head>
 <body>
 
-    <main>
-        <header>
-            <div>
-                <h1>Thamer Almutairi</h1>
-                <p style="font-size: 1rem; color: #444;">pentester / student</p>
-                <p style="font-size: 0.9rem; color: #333; margin-top: 5px;">Kuwait • 17 y/o</p>
-            </div>
-            <img src="./1.jpg" alt="" class="avatar">
-        </header>
+<main>
 
-        <section>
-            <h2 style="color: #444; font-size: 0.8rem; text-transform: lowercase; margin-bottom: 0.8rem; border-bottom: 1px solid var(--border); display: inline-block;">My Certifications</h2>
-            <div style="display: flex; flex-wrap: wrap; gap: 8px; margin-top: 5px;">
-                <span style="border: 1px solid var(--border); padding: 2px 6px; font-size: 0.8rem; color: #555;">eCPPTv3</span>
-                <span style="border: 1px solid var(--border); padding: 2px 6px; font-size: 0.8rem; color: #555;">eWPTXv3</span>
-                <span style="border: 1px solid var(--border); padding: 2px 6px; font-size: 0.8rem; color: #555;">CRTA</span>
-                <span style="border: 1px solid var(--border); padding: 2px 6px; font-size: 0.8rem; color: #555;">eJPTv2</span>
-                <span style="border: 1px solid var(--border); padding: 2px 6px; font-size: 0.8rem; color: #555;">PT1</span>
-            </div>
-        </section>
+    <header>
+        <div>
+            <h1>Thamer Almutairi</h1>
+            <p style="font-size:1rem; color:#444;">pentester / student</p>
+            <p style="font-size:0.9rem; color:#333; margin-top:5px;">Kuwait · 17 y/o</p>
+        </div>
+        <img src="./1.jpg" alt="" class="avatar">
+    </header>
 
-        <section>
-            <p>
-                Kuwaiti penetration tester and developer. Focused on <strong>Red Teaming</strong> and system intrusion
-            </p>
-            <p>
-                Interested in <strong>chess</strong>, <strong>bodybuilding</strong>, and <strong>gaming</strong>
-            </p>
-        </section>
+    <section>
+        <h2 class="section-label">certifications</h2>
+        <div class="certs">
+            <span class="cert-tag">eCPPTv3</span>
+            <span class="cert-tag">eWPTXv3</span>
+            <span class="cert-tag">CRTA</span>
+            <span class="cert-tag">eJPTv2</span>
+            <span class="cert-tag">PT1</span>
+        </div>
+    </section>
 
-        <section>
-            <div class="links">
-                
-                <a href="https://twitter.com/sliusx" class="link-item">
-                    <div class="link-left">
-                        <svg class="pixel-icon" viewBox="0 0 16 16">
-                            <path d="M2 2h4l3 4 3-4h2L9.5 8 14 14h-4l-3-4-3 4H2l4.5-6z"/>
-                        </svg>
-                        <span>x (twitter)</span>
+    <section>
+        <p>Kuwaiti penetration tester and developer. Focused on <strong>Red Teaming</strong> and system intrusion.</p>
+        <p>Interested in <strong>chess</strong>, <strong>bodybuilding</strong>, and <strong>gaming</strong>.</p>
+    </section>
+
+    <section>
+        <h2 class="section-label">research</h2>
+        <div class="research-grid">
+
+            <a href="./sbl.html" class="research-item">
+                <span class="research-num">01</span>
+                <div class="research-body">
+                    <span class="research-title">Science-Based Lifting</span>
+                    <div class="research-sub">
+                        <span>2026</span>
+                        <span class="r-tag">hypertrophy</span>
+                        <span class="r-tag">biomechanics</span>
+                                                <span class="r-tag">SBL</span>
+
                     </div>
-                    <span>@sliusx</span>
-                </a>
+                </div>
+                <span class="research-arrow">→</span>
+            </a>
 
-                <a href="https://www.linkedin.com/in/thamer-almutairi-676582309/" class="link-item">
-                    <div class="link-left">
-                        <svg class="pixel-icon" viewBox="0 0 16 16">
-                            <path d="M2 2h12v12H2V2zm2 3h2v2H4V5zm0 3h2v4H4V8zm4 0h2v1h1v3h-1v-2h-1v2H8V8z"/>
-                        </svg>
-                        <span>linkedin</span>
-                    </div>
-                    <span>connect</span>
-                </a>
 
-                <a href="https://www.tiktok.com/@itkilh" class="link-item">
-                    <div class="link-left">
-                        <svg class="pixel-icon" viewBox="0 0 16 16">
-                            <path d="M10 2h2v2h2v2h-2v4h-2V6H8v4H6v-2H4v-2h4V2zM8 10v2H6v-2h2z"/>
-                        </svg>
-                        <span>tiktok</span>
-                    </div>
-                    <span>@itkilh</span>
-                </a>
+        </div>
+    </section>
 
-                <a href="https://instagram.com/0xth4mer" class="link-item">
-                    <div class="link-left">
-                        <svg class="pixel-icon" viewBox="0 0 16 16">
-                            <path d="M3 3h10v10H3V3zm2 2v6h6V5H5zm2 2h2v2H7V7z"/>
-                        </svg>
-                        <span>instagram</span>
-                    </div>
-                    <span>@0xth4mer</span>
-                </a>
+    <section>
+        <h2 class="section-label">links</h2>
+        <div class="links">
 
-            </div>
-        </section>
-    </main>
+            <a href="https://twitter.com/sliusx" class="link-item">
+                <div class="link-left">
+                    <svg class="pixel-icon" viewBox="0 0 16 16">
+                        <path d="M2 2h4l3 4 3-4h2L9.5 8 14 14h-4l-3-4-3 4H2l4.5-6z"/>
+                    </svg>
+                    <span>x (twitter)</span>
+                </div>
+                <span>@sliusx</span>
+            </a>
+
+            <a href="https://www.linkedin.com/in/thamer-almutairi-676582309/" class="link-item">
+                <div class="link-left">
+                    <svg class="pixel-icon" viewBox="0 0 16 16">
+                        <path d="M2 2h12v12H2V2zm2 3h2v2H4V5zm0 3h2v4H4V8zm4 0h2v1h1v3h-1v-2h-1v2H8V8z"/>
+                    </svg>
+                    <span>linkedin</span>
+                </div>
+                <span>connect</span>
+            </a>
+
+            <a href="https://www.tiktok.com/@itkilh" class="link-item">
+                <div class="link-left">
+                    <svg class="pixel-icon" viewBox="0 0 16 16">
+                        <path d="M10 2h2v2h2v2h-2v4h-2V6H8v4H6v-2H4v-2h4V2zM8 10v2H6v-2h2z"/>
+                    </svg>
+                    <span>tiktok</span>
+                </div>
+                <span>@itkilh</span>
+            </a>
+
+            <a href="https://instagram.com/0xth4mer" class="link-item">
+                <div class="link-left">
+                    <svg class="pixel-icon" viewBox="0 0 16 16">
+                        <path d="M3 3h10v10H3V3zm2 2v6h6V5H5zm2 2h2v2H7V7z"/>
+                    </svg>
+                    <span>instagram</span>
+                </div>
+                <span>@0xth4mer</span>
+            </a>
+
+        </div>
+    </section>
+
+</main>
 
 </body>
 </html>
