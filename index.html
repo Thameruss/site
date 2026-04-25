@@ -4,296 +4,812 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Thamer Almutairi</title>
-    <link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet">
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Martian+Mono:wght@300;400;500&family=VT323&display=swap" rel="stylesheet">
+
     <style>
-        :root {
-            --bg: #000;
-            --text: #7a7a7a;
-            --accent: #d1d1d1;
-            --border: #1a1a1a;
-            --font-pixel: 'VT323', monospace;
+    /* ╔══════════════════════════════════════════════╗
+       ║  DESIGN TOKENS                               ║
+       ╚══════════════════════════════════════════════╝ */
+    :root {
+        --bg:           #04040a;
+        --surface:      #07070f;
+        --lift:         #0c0c18;
+        --border:       #111120;
+        --border-2:     #1c1c30;
+        --border-3:     #282840;
+        --dim:          #252538;
+        --muted:        #3a3a55;
+        --mid:          #555570;
+        --sub:          #7070a0;
+        --hi:           #b0b0d8;
+        --peak:         #e4e4f4;
+        --amber:        #c8922a;
+        --amber-dim:    #3a2808;
+        --green:        #1e5c3a;
+        --green-glow:   #2ecc71;
+        --purple:       #a855f7;
+        --orange:       #f59e0b;
+        --font-mono:    'Martian Mono', monospace;
+        --font-pixel:   'VT323', monospace;
+        --ease-expo:    cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    /* ╔══════════════════════════════════════════════╗
+       ║  RESET & BASE                                ║
+       ╚══════════════════════════════════════════════╝ */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; overflow-x: hidden; }
+
+    body {
+        background: var(--bg);
+        color: var(--muted);
+        font-family: var(--font-mono);
+        font-size: 0.73rem;
+        font-weight: 300;
+        line-height: 1.8;
+        min-height: 100vh;
+        overflow-x: hidden;
+        width: 100%;
+    }
+
+    ::selection { background: rgba(176,176,216,0.15); color: var(--peak); }
+    ::-webkit-scrollbar { width: 2px; }
+    ::-webkit-scrollbar-track { background: var(--bg); }
+    ::-webkit-scrollbar-thumb { background: var(--border-2); }
+
+    /* ╔══════════════════════════════════════════════╗
+       ║  UTILITIES                                   ║
+       ╚══════════════════════════════════════════════╝ */
+    .txt-purple { color: var(--purple) !important; }
+    .txt-orange { color: var(--orange) !important; }
+    
+    .txt-inline-link {
+        color: var(--sub);
+        text-decoration: none;
+        border-bottom: 1px dashed var(--border-3);
+        transition: all 0.2s;
+    }
+    .txt-inline-link:hover {
+        color: var(--peak);
+        border-bottom-color: var(--peak);
+    }
+
+    /* ╔══════════════════════════════════════════════╗
+       ║  OVERLAYS                                    ║
+       ╚══════════════════════════════════════════════╝ */
+    #o-scan {
+        position: fixed; inset: 0; z-index: 800; pointer-events: none;
+        background: repeating-linear-gradient(
+            0deg, transparent 0px, transparent 3px,
+            rgba(0,0,0,0.055) 3px, rgba(0,0,0,0.055) 4px
+        );
+    }
+    #o-vig {
+        position: fixed; inset: 0; z-index: 801; pointer-events: none;
+        background: radial-gradient(ellipse 90% 90% at 50% 50%,
+            transparent 35%, rgba(0,0,0,0.75) 100%);
+    }
+    #o-grid {
+        position: fixed; inset: 0; z-index: 1; pointer-events: none;
+        background-image:
+            linear-gradient(var(--border) 1px, transparent 1px),
+            linear-gradient(90deg, var(--border) 1px, transparent 1px);
+        background-size: 52px 52px;
+        -webkit-mask-image: radial-gradient(ellipse 65% 65% at 50% 25%,
+            black 0%, transparent 100%);
+        mask-image: radial-gradient(ellipse 65% 65% at 50% 25%,
+            black 0%, transparent 100%);
+        opacity: 0.4;
+    }
+    #o-corners { position: fixed; inset: 0; z-index: 802; pointer-events: none; }
+    .crn {
+        position: absolute; width: 16px; height: 16px;
+        border-color: var(--border-2); border-style: solid;
+    }
+    .crn.tl { top: 14px; left: 14px; border-width: 1px 0 0 1px; }
+    .crn.tr { top: 14px; right: 14px; border-width: 1px 1px 0 0; }
+    .crn.bl { bottom: 14px; left: 14px; border-width: 0 0 1px 1px; }
+    .crn.br { bottom: 14px; right: 14px; border-width: 0 1px 1px 0; }
+
+    /* ╔══════════════════════════════════════════════╗
+       ║  LAYOUT                                      ║
+       ╚══════════════════════════════════════════════╝ */
+    #main {
+        position: relative; z-index: 10;
+        max-width: 560px;
+        margin: 0 auto;
+        padding: 5.5rem 2rem 8rem;
+        opacity: 0; transform: translateY(10px);
+        transition: opacity .9s var(--ease-expo), transform .9s var(--ease-expo);
+    }
+    #main.show { opacity: 1; transform: none; }
+
+    /* ╔══════════════════════════════════════════════╗
+       ║  REVEAL                                      ║
+       ╚══════════════════════════════════════════════╝ */
+    .rv {
+        opacity: 0; transform: translateY(12px);
+        transition: opacity .75s var(--ease-expo), transform .75s var(--ease-expo);
+    }
+    .rv.in { opacity: 1; transform: none; }
+
+    /* ╔══════════════════════════════════════════════╗
+       ║  HEADER                                      ║
+       ╚══════════════════════════════════════════════╝ */
+    header {
+        display: grid;
+        grid-template-columns: 1fr 78px;
+        gap: 2rem;
+        align-items: start;
+        margin-bottom: 5rem;
+    }
+
+    h1 {
+        font-family: var(--font-pixel);
+        font-weight: normal; font-size: 3.2rem;
+        line-height: 0.92; color: var(--peak);
+        letter-spacing: 1px; margin-bottom: 1.3rem;
+        text-shadow: 0 0 40px rgba(176,176,216,0.08);
+        cursor: default;
+    }
+
+    .roles { display: flex; flex-direction: column; gap: 6px; }
+    .role { display: flex; align-items: center; gap: 9px; font-size: 0.64rem; color: var(--muted); letter-spacing: .05em; }
+
+    .dot-live {
+        width: 5px; height: 5px; border-radius: 50%;
+        background: var(--green-glow);
+        box-shadow: 0 0 0 0 rgba(46,204,113,.5);
+        animation: live-p 3s ease infinite; flex-shrink: 0;
+    }
+    @keyframes live-p {
+        0%  { box-shadow: 0 0 0 0 rgba(46,204,113,.5); }
+        70% { box-shadow: 0 0 0 6px rgba(46,204,113,0); }
+        100%{ box-shadow: 0 0 0 0 rgba(46,204,113,0); }
+    }
+
+    .role-tag, .role-tag-small {
+        margin-left: auto; font-size: .48rem; color: var(--amber);
+        border: 1px solid var(--amber-dim); padding: 1px 6px;
+        letter-spacing: .14em; text-transform: uppercase;
+    }
+
+    .meta { font-size: .58rem; color: var(--border-3); margin-top: .8rem; letter-spacing: .12em; }
+
+    /* Avatar */
+    .av-wrap { position: relative; width: 78px; height: 78px; }
+    .av-wrap img {
+        width: 100%; height: 100%; display: block; object-fit: cover;
+        filter: grayscale(100%) brightness(.42) contrast(1.25);
+        border: 1px solid var(--border-2);
+        transition: filter .5s var(--ease-expo);
+    }
+    .av-wrap:hover img { filter: grayscale(100%) brightness(.6) contrast(1.2); }
+    .av-crn { position: absolute; width: 7px; height: 7px; border-color: var(--border-3); border-style: solid; }
+    .av-crn.tl { top:-4px; left:-4px; border-width:1px 0 0 1px; }
+    .av-crn.tr { top:-4px; right:-4px; border-width:1px 1px 0 0; }
+    .av-crn.bl { bottom:-4px; left:-4px; border-width:0 0 1px 1px; }
+    .av-crn.br { bottom:-4px; right:-4px; border-width:0 1px 1px 0; }
+
+    /* ╔══════════════════════════════════════════════╗
+       ║  SECTION LABEL                               ║
+       ╚══════════════════════════════════════════════╝ */
+    section { margin-bottom: 3.4rem; }
+
+    .slabel {
+        font-size: .55rem; letter-spacing: .22em;
+        text-transform: uppercase; color: var(--border-3);
+        margin-bottom: 1.2rem;
+        display: flex; align-items: center; gap: 10px;
+    }
+    .slabel::after { content: ""; flex: 1; height: 1px; background: var(--border); }
+
+    /* ╔══════════════════════════════════════════════╗
+       ║  BIO                                         ║
+       ╚══════════════════════════════════════════════╝ */
+    .bio-card {
+        border: 1px solid var(--border);
+        background: var(--surface);
+        padding: 1.6rem 1.5rem;
+        position: relative; overflow: hidden;
+    }
+    .bio-card::after {
+        content: "";
+        position: absolute; top: 0; right: 0;
+        width: 130px; height: 130px;
+        background: radial-gradient(circle at top right, rgba(30,30,80,.2), transparent 70%);
+        pointer-events: none;
+    }
+
+    .bio-row {
+        display: flex; gap: 12px;
+        margin-bottom: .9rem; font-size: .72rem;
+        color: var(--muted); line-height: 1.85;
+    }
+    .bio-row:last-child { margin-bottom: 0; }
+    .bio-p { color: var(--border-3); flex-shrink: 0; font-size: .65rem; margin-top: .05rem; user-select: none; }
+
+    /* ╔══════════════════════════════════════════════╗
+       ║  CERTIFICATIONS                              ║
+       ╚══════════════════════════════════════════════╝ */
+    .certs { display: flex; flex-wrap: wrap; gap: 7px; }
+    .cert {
+        border: 1px solid var(--border); padding: 4px 11px;
+        font-size: .6rem; color: var(--dim);
+        letter-spacing: .12em; text-transform: uppercase;
+        position: relative; overflow: hidden;
+        transition: color .25s, border-color .25s;
+    }
+    .cert::before {
+        content: ""; position: absolute; inset: 0;
+        background: rgba(176,176,216,.035);
+        transform: translateX(-100%);
+        transition: transform .4s var(--ease-expo);
+    }
+    .cert:hover::before { transform: none; }
+    .cert:hover { color: var(--peak); border-color: var(--border-3); text-shadow: 0 0 14px rgba(228,228,244,.25); }
+
+    /* ╔══════════════════════════════════════════════╗
+       ║  STACK & PWN CARDS                           ║
+       ╚══════════════════════════════════════════════╝ */
+    .stack-card {
+        border: 1px solid var(--border-2);
+        background: var(--surface);
+        overflow: hidden; position: relative;
+        margin-bottom: 2rem;
+    }
+    .stack-card:last-child { margin-bottom: 0; }
+    .stack-card::before {
+        content: ""; position: absolute;
+        top: 0; left: 0; right: 0; height: 1px;
+        background: linear-gradient(90deg,
+            transparent 0%, var(--border-3) 20%,
+            rgba(200,146,42,.3) 50%,
+            var(--border-3) 80%, transparent 100%);
+        background-size: 200% 100%;
+        animation: topbar-sweep 6s ease infinite;
+    }
+    @keyframes topbar-sweep {
+        0%   { background-position: 200% 0; }
+        100% { background-position: -200% 0; }
+    }
+
+    .stack-head {
+        padding: 1.6rem 1.6rem 1.2rem;
+        border-bottom: 1px solid var(--border);
+        display: flex; align-items: baseline; gap: 14px;
+    }
+    .stack-wordmark {
+        font-family: var(--font-pixel); font-size: 2.5rem;
+        color: var(--peak); letter-spacing: 6px; line-height: 1;
+        cursor: default;
+    }
+    .stack-badge {
+        font-size: .55rem; color: var(--amber);
+        letter-spacing: .16em; border: 1px solid var(--amber-dim);
+        padding: 2px 8px; text-transform: uppercase;
+        white-space: nowrap;
+    }
+
+    .stack-body { padding: 1.4rem 1.6rem; }
+    .stack-txt { font-size: .72rem; color: #3e3e5a; line-height: 1.9; }
+    .stack-txt p + p { margin-top: .8rem; }
+
+    .pillars {
+        display: grid; grid-template-columns: 1fr 1fr;
+        gap: 8px; margin-top: 1.4rem;
+    }
+    .pillar {
+        border: 1px solid var(--border); padding: 12px 13px;
+        transition: border-color .25s, background .25s; cursor: default;
+    }
+    .pillar:hover { border-color: var(--border-2); background: var(--lift); }
+    .pn { font-size: .52rem; color: var(--border-3); letter-spacing: .15em; display: block; margin-bottom: 5px; }
+    .pt { font-size: .65rem; color: var(--sub); display: block; margin-bottom: 3px; transition: color .2s; }
+    .pillar:hover .pt { color: var(--hi); }
+    .pd { font-size: .58rem; color: var(--border-2); line-height: 1.65; }
+
+    .stack-progress {
+        padding: 1.2rem 1.6rem; border-top: 1px solid var(--border);
+    }
+    .prog-hd { display: flex; justify-content: space-between; margin-bottom: 7px; }
+    .prog-lbl { font-size: .55rem; color: var(--border-3); letter-spacing: .16em; text-transform: uppercase; }
+    .prog-pct { font-family: var(--font-pixel); font-size: 1rem; color: var(--green-glow); }
+
+    .prog-track { height: 2px; background: var(--border); position: relative; overflow: hidden; }
+    .prog-fill {
+        height: 100%; width: 0%;
+        background: linear-gradient(90deg, var(--green), var(--green-glow));
+        transition: width 2s var(--ease-expo); position: relative;
+    }
+    .prog-fill::after {
+        content: ""; position: absolute;
+        right: 0; top: -2px; bottom: -2px; width: 5px;
+        background: var(--green-glow);
+        box-shadow: 0 0 10px var(--green-glow), 0 0 20px rgba(46,204,113,.4);
+    }
+
+    .stack-status {
+        padding: .9rem 1.6rem; border-top: 1px solid var(--border);
+        display: flex; align-items: center; gap: 10px;
+    }
+    .status-pill {
+        display: inline-flex; align-items: center; gap: 6px;
+        border: 1px solid var(--green); padding: 3px 9px;
+        font-size: .55rem; color: var(--green-glow);
+        letter-spacing: .14em; text-transform: uppercase;
+        white-space: nowrap;
+    }
+    .status-pill .sd {
+        width: 4px; height: 4px; border-radius: 50%;
+        background: var(--green-glow);
+        animation: blink-d 2.2s ease infinite;
+    }
+    @keyframes blink-d { 0%,100%{opacity:1} 50%{opacity:.25} }
+    .status-eta { font-size: .55rem; color: var(--border-3); letter-spacing: .1em; margin-left: auto; text-align: right; }
+
+    /* ╔══════════════════════════════════════════════╗
+       ║  RESEARCH                                    ║
+       ╚══════════════════════════════════════════════╝ */
+    .research-grid {
+        border: 1px solid var(--border);
+        display: flex; flex-direction: column; overflow: hidden;
+    }
+
+    .res-item {
+        text-decoration: none;
+        display: flex; align-items: stretch;
+        border-bottom: 1px solid var(--border);
+        position: relative; overflow: hidden;
+        transition: background .25s;
+    }
+    .res-item:last-child { border-bottom: none; }
+    .res-item::before {
+        content: ""; position: absolute;
+        left: 0; top: 0; bottom: 0; width: 2px;
+        background: linear-gradient(180deg, transparent, var(--hi), transparent);
+        transform: scaleY(0); transform-origin: center;
+        transition: transform .35s var(--ease-expo);
+    }
+    .res-item:hover::before { transform: scaleY(1); }
+    .res-item:hover { background: rgba(176,176,216,.018); }
+
+    .res-num {
+        font-size: .55rem; color: var(--border-2);
+        padding: 16px 13px; border-right: 1px solid var(--border);
+        display: flex; align-items: flex-start;
+        min-width: 42px; flex-shrink: 0; letter-spacing: .08em;
+    }
+    
+    .res-body { padding: 14px 16px; flex: 1; min-width: 0; }
+    .res-title {
+        font-family: var(--font-pixel); font-size: 1.25rem;
+        color: var(--mid); display: block; margin-bottom: 5px;
+        letter-spacing: .5px; line-height: 1.2;
+        transition: color .25s, text-shadow .25s;
+        white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    .res-item:hover .res-title { color: var(--peak); text-shadow: 0 0 16px rgba(228,228,244,.22); }
+
+    .res-meta {
+        display: flex; align-items: center; flex-wrap: wrap;
+        gap: 6px; font-size: .56rem; color: var(--border-2);
+    }
+    .res-tag {
+        border: 1px solid var(--border); padding: 1px 6px;
+        font-size: .52rem; color: var(--dim);
+        letter-spacing: .1em; text-transform: uppercase;
+        transition: border-color .2s, color .2s;
+    }
+    .res-item:hover .res-tag { border-color: var(--border-2); color: var(--muted); }
+
+    .res-arrow {
+        display: flex; align-items: center; padding: 14px;
+        color: var(--border-2); flex-shrink: 0; font-size: .9rem;
+        transition: color .25s, transform .3s var(--ease-expo);
+    }
+    .res-item:hover .res-arrow { color: var(--sub); transform: translateX(3px); }
+
+    /* ╔══════════════════════════════════════════════╗
+       ║  LINKS                                       ║
+       ╚══════════════════════════════════════════════╝ */
+    .links-wrap { border: 1px solid var(--border); display: flex; flex-direction: column; }
+
+    .lnk {
+        text-decoration: none;
+        display: flex; align-items: center;
+        padding: 11px 14px; border-bottom: 1px solid var(--border);
+        gap: 11px; position: relative; overflow: hidden;
+        transition: background .2s;
+    }
+    .lnk:last-child { border-bottom: none; }
+    .lnk::before {
+        content: ""; position: absolute;
+        left: 0; top: 0; bottom: 0; width: 2px;
+        background: var(--hi);
+        transform: scaleY(0); transform-origin: bottom;
+        transition: transform .3s var(--ease-expo);
+    }
+    .lnk:hover::before { transform: scaleY(1); }
+    .lnk:hover { background: rgba(176,176,216,.02); }
+
+    .lnk-ico {
+        width: 13px; height: 13px; fill: var(--border-2);
+        flex-shrink: 0; shape-rendering: crispEdges;
+        transition: fill .2s;
+    }
+    .lnk:hover .lnk-ico { fill: var(--mid); }
+
+    .lnk-name {
+        font-size: .7rem; color: var(--muted);
+        letter-spacing: .06em; flex: 1;
+        transition: color .2s;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+    .lnk:hover .lnk-name { color: var(--hi); }
+
+    .lnk-handle {
+        font-size: .6rem; color: var(--border-2);
+        letter-spacing: .05em; transition: color .2s;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+    .lnk:hover .lnk-handle { color: var(--sub); }
+
+    .lnk-arr {
+        font-size: .65rem; color: var(--border-2); margin-left: 4px;
+        transition: color .2s, transform .3s var(--ease-expo);
+        flex-shrink: 0;
+    }
+    .lnk:hover .lnk-arr { color: var(--mid); transform: translateX(3px); }
+
+    .lnk.featured { background: var(--surface); }
+    .lnk.featured .lnk-name { color: var(--hi); }
+    .lnk.featured .lnk-ico { fill: var(--sub); }
+
+    /* ╔══════════════════════════════════════════════╗
+       ║  FOOTER                                      ║
+       ╚══════════════════════════════════════════════╝ */
+    footer {
+        margin-top: 5rem; padding-top: 1.5rem;
+        border-top: 1px solid var(--border);
+        display: flex; justify-content: space-between; align-items: center;
+    }
+    .footer-l { font-size: .56rem; color: var(--border-3); letter-spacing: .12em; }
+    .footer-r {
+        display: flex; align-items: center; gap: 7px;
+        font-size: .56rem; color: var(--border-3); letter-spacing: .08em;
+    }
+    .underline-focus {
+        text-decoration: underline;
+        text-underline-offset: 4px;
+        text-decoration-thickness: 2px;
+    }
+
+    /* ╔══════════════════════════════════════════════╗
+       ║  100% BULLETPROOF MOBILE RESPONSIVE          ║
+       ╚══════════════════════════════════════════════╝ */
+    @media (max-width: 560px) {
+        #main {
+            padding: 2rem 1.2rem 4rem;
+            width: 100%;
         }
-
-        * { box-sizing: border-box; margin: 0; padding: 0; cursor: crosshair; }
-
-        html, body { margin: 0; padding: 0; min-height: 100vh; }
-
-        body {
-            background: var(--bg);
-            color: var(--text);
-            font-family: var(--font-pixel);
-            font-size: 1.3rem;
-            line-height: 1.4;
-            padding: 5rem 1.5rem;
-            overflow-x: clip;
-            overflow-y: visible;
-        }
-
-        /* Scanlines */
-        body::before {
-            content: "";
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background:
-                linear-gradient(rgba(18,16,16,0) 50%, rgba(0,0,0,0.1) 50%),
-                linear-gradient(90deg, rgba(255,0,0,0.02), rgba(0,255,0,0.01), rgba(0,0,255,0.02));
-            background-size: 100% 3px, 3px 100%;
-            pointer-events: none;
-            z-index: 100;
-        }
-
-        main {
-            max-width: 500px;
-            margin: 0 auto;
-            position: relative;
-            z-index: 10;
-            padding-bottom: 6rem;
-        }
-
-        /* HEADER */
+        
+        /* Flex column-reverse puts the avatar above the text visually! */
         header {
             display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            margin-bottom: 3rem;
+            flex-direction: column-reverse;
+            gap: 1.5rem;
+            margin-bottom: 3.5rem;
         }
-
-        h1 { color: var(--accent); font-size: 2.2rem; font-weight: normal; }
-
-        .avatar {
-            width: 75px;
-            height: 75px;
-            filter: grayscale(100%) brightness(0.6);
-            border: 1px solid var(--border);
+        
+        .av-wrap {
+            width: 65px; 
+            height: 65px;
+            flex-shrink: 0;
         }
-
-        /* SECTION LABEL */
-        .section-label {
-            color: #444;
-            font-size: 0.8rem;
-            text-transform: lowercase;
-            margin-bottom: 0.8rem;
-            border-bottom: 1px solid var(--border);
-            display: inline-block;
-            padding-bottom: 2px;
+        
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            word-break: break-word; /* Prevents overflow */
         }
-
-        section { margin-bottom: 2.5rem; }
-        p { margin-bottom: 1rem; color: #555; }
-        strong { color: var(--accent); font-weight: normal; }
-
-        /* CERTS */
-        .certs { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 5px; }
-        .cert-tag {
-            border: 1px solid var(--border);
-            padding: 2px 6px;
-            font-size: 0.8rem;
-            color: #555;
-            transition: color .2s, border-color .2s;
+        
+        .role {
+            flex-wrap: wrap; /* Allows role tags to drop to the next line if tight */
+            line-height: 1.6;
         }
-        .cert-tag:hover { color: var(--accent); border-color: #333; }
-
-        /* LINKS */
-        .links { display: flex; flex-direction: column; gap: 10px; }
-
-        .link-item {
-            text-decoration: none;
-            color: var(--text);
-            padding: 12px 16px;
-            border: 1px solid var(--border);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            transition: background .2s, color .2s, border-color .2s;
+        
+        .role-tag, .role-tag-small {
+            margin-left: 0;
+            margin-top: 4px;
         }
-        .link-item:hover {
-            background: rgba(255,255,255,0.03);
-            color: var(--accent);
-            border-color: #2a2a2a;
-        }
-
-        .link-left { display: flex; align-items: center; gap: 12px; }
-
-        .pixel-icon {
-            width: 18px; height: 18px;
-            fill: currentColor;
-            shape-rendering: crispEdges;
-        }
-
-        /* RESEARCH */
-        .research-grid {
-            border: 1px solid var(--border);
-            display: flex;
+        
+        /* Stop huge text from breaking the card */
+        .stack-head {
             flex-direction: column;
-        }
-
-        .research-item {
-            text-decoration: none;
-            display: flex;
-            align-items: stretch;
-            border-bottom: 1px solid var(--border);
-            position: relative;
-            overflow: hidden;
-            transition: background .2s;
-        }
-        .research-item:last-child { border-bottom: none; }
-        .research-item:hover { background: rgba(255,255,255,0.02); }
-
-        .research-num {
-            font-size: 0.72rem;
-            color: #2a2a2a;
-            padding: 16px 14px;
-            border-right: 1px solid var(--border);
-            display: flex;
             align-items: flex-start;
-            min-width: 42px;
-            flex-shrink: 0;
+            gap: 10px;
         }
-
-        .research-body { padding: 14px 16px; flex: 1; }
-
-        .research-title {
-            color: var(--accent);
-            font-size: 1.15rem;
-            display: block;
-            margin-bottom: 4px;
-            transition: color .2s;
+        
+        .stack-wordmark {
+            font-size: 1.8rem;
+            letter-spacing: 2px;
+            word-break: break-word;
         }
-        .research-item:hover .research-title { color: #fff; }
-
-        .research-sub {
-            font-size: 0.72rem;
-            color: #333;
-            display: flex;
-            align-items: center;
+        
+        .pillars {
+            grid-template-columns: 1fr;
+        }
+        
+        /* Prevent links from breaking width */
+        .lnk {
+            padding: 12px;
             gap: 8px;
-            flex-wrap: wrap;
         }
-
-        .r-tag {
-            border: 1px solid #1c1c1c;
-            padding: 1px 5px;
-            font-size: 0.65rem;
-            color: #363636;
-        }
-
-        .research-arrow {
-            display: flex;
-            align-items: center;
-            padding: 14px 14px;
-            color: #282828;
+        
+        /* Ensure long titles don't overflow */
+        .res-title {
+            white-space: normal;
             font-size: 1.1rem;
-            flex-shrink: 0;
-            transition: color .2s;
         }
-        .research-item:hover .research-arrow { color: #666; }
-
-        .research-item.wip {
-            opacity: 0.35;
-            pointer-events: none;
+        
+        .stack-status {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 10px;
         }
+        
+        .status-eta {
+            margin-left: 0;
+            text-align: left;
+        }
+        
+        footer {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 1rem;
+        }
+    }
     </style>
 </head>
 <body>
 
-<main>
+<div id="o-scan"></div>
+<div id="o-vig"></div>
+<div id="o-grid"></div>
+<div id="o-corners">
+    <div class="crn tl"></div><div class="crn tr"></div>
+    <div class="crn bl"></div><div class="crn br"></div>
+</div>
 
-    <header>
+<div id="main" class="show">
+
+    <header class="rv">
         <div>
-            <h1>Thamer Almutairi</h1>
-            <p style="font-size:1rem; color:#444;">pentester / student</p>
-            <p style="font-size:0.9rem; color:#333; margin-top:5px;">Kuwait · 17 y/o</p>
+            <h1>Thamer<br>Almutairi</h1>
+            <div class="roles">
+                <div class="role">
+                    <span class="dot-live"></span>
+                    pentester red teamer
+                </div>
+                <div class="role">
+                    <span class="dot-live"></span>
+                    Co Founder of <span class="txt-purple">PwnTheCity</span>
+                    <span class="role-tag">co founder</span>
+                </div>
+                <div class="role">
+                    <span class="dot-live"></span>
+                    Founder of <span class="txt-orange">Stack</span>
+                    <span class="role-tag">founder</span>
+                </div>
+            </div>
+            <div class="meta">🇰🇼 . 17 yo</div>
         </div>
-        <img src="./1.jpg" alt="" class="avatar">
+        <div class="av-wrap">
+            <img src="./1.jpg" alt="Thamer"
+                onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%2278%22 height=%2278%22><rect width=%2278%22 height=%2278%22 fill=%22%230c0c18%22/></svg>'">
+            <div class="av-crn tl"></div><div class="av-crn tr"></div>
+            <div class="av-crn bl"></div><div class="av-crn br"></div>
+        </div>
     </header>
 
-    <section>
-        <h2 class="section-label">certifications</h2>
-        <div class="certs">
-            <span class="cert-tag">eCPPTv3</span>
-            <span class="cert-tag">eWPTXv3</span>
-            <span class="cert-tag">CRTA</span>
-            <span class="cert-tag">eJPTv2</span>
-            <span class="cert-tag">PT1</span>
+    <section class="rv" style="--d:.06s">
+        <div class="slabel">about</div>
+        <div class="bio-card">
+            <div class="bio-row">
+                <span class="bio-p">$</span>
+                <span>Kuwaiti 17yo heavily into cybersecurity, bodybuilding, and chess. Building the next generation of security platforms in the region</span>
+            </div>
+            <div class="bio-row">
+                <span class="bio-p">$</span>
+                <span>Co Founder of <span class="txt-purple">PwnTheCity</span> a cybersecurity platform packed with custom CTFs and machines built from scratch by me and my friend <a href="https://al0dan.com" target="_blank" class="txt-inline-link">al0dan</a></span>
+            </div>
+            <div class="bio-row">
+                <span class="bio-p">$</span>
+                <span>Founder of <span class="txt-orange">Stack</span> a security research enterprise, bug bounty platform, and academy. We bring in top tier instructors to guide students from complete beginners to elite level operators leading the field in the country</span>
+            </div>
         </div>
     </section>
 
-    <section>
-        <p>Kuwaiti penetration tester and developer. Focused on <strong>Red Teaming</strong> and system intrusion.</p>
-        <p>Interested in <strong>chess</strong>, <strong>bodybuilding</strong>, and <strong>gaming</strong>.</p>
+    <section class="rv" style="--d:.1s">
+        <div class="slabel">certifications</div>
+        <div class="certs">
+            <span class="cert">eCPPTv3</span>
+            <span class="cert">eWPTXv3</span>
+            <span class="cert">CRTA</span>
+            <span class="cert">eJPTv2</span>
+            <span class="cert">PT1</span>
+        </div>
     </section>
 
-    <section>
-        <h2 class="section-label">research</h2>
-        <div class="research-grid">
+    <section class="rv" style="--d:.14s">
+        <div class="slabel">initiatives</div>
+        
+        <div class="stack-card">
+            <div class="stack-head">
+                <div class="stack-wordmark txt-purple">PwnTheCity</div>
+                <div class="stack-badge">CTF Platform</div>
+            </div>
+            <div class="stack-body">
+                <div class="stack-txt">
+                    <p>A premier cybersecurity platform featuring advanced CTFs and vulnerable machines designed and built by me and my friend <a href="https://al0dan.com" target="_blank" class="txt-inline-link">al0dan</a></p>
+                </div>
+            </div>
+        </div>
 
-            <a href="./sbl.html" class="research-item">
-                <span class="research-num">01</span>
-                <div class="research-body">
-                    <span class="research-title">Science-Based Lifting</span>
-                    <div class="research-sub">
-                        <span>2026</span>
-                        <span class="r-tag">hypertrophy</span>
-                        <span class="r-tag">biomechanics</span>
-                                                <span class="r-tag">SBL</span>
-
+        <div class="stack-card">
+            <div class="stack-head">
+                <div class="stack-wordmark txt-orange">STACK.</div>
+                <div class="stack-badge">🇰🇼 #1</div>
+            </div>
+            <div class="stack-body">
+                <div class="stack-txt">
+                    <p>A security research enterprise, bug bounty platform, and full scale academy</p>
+<p>
+We provide courses ranging from 
+<span class="underline-focus">absolute beginner to advanced</span> 
+in cyber security, taught by top tier instructors in the country
+</p>                </div>
+                <div class="pillars">
+                    <div class="pillar">
+                        <span class="pn">01</span>
+                        <span class="pt">Bug Bounty</span>
+                        <span class="pd">Regional platform. Real targets. real rewards 💯</span>
+                    </div>
+                    <div class="pillar">
+                        <span class="pn">02</span>
+                        <span class="pt">Academy</span>
+                        <span class="pd">Academy
+From beginner to elite offensive level no shortcuts</span>
                     </div>
                 </div>
-                <span class="research-arrow">→</span>
-            </a>
-
-
+            </div>
+            <div class="stack-status">
+                <div class="status-pill">
+                    <span class="sd"></span>
+                    in development
+                </div>
+                <span class="status-eta">ETA Summer 2026</span>
+            </div>
         </div>
     </section>
 
-    <section>
-        <h2 class="section-label">links</h2>
-        <div class="links">
+    <section class="rv" style="--d:.18s">
+        <div class="slabel">research</div>
+        <div class="research-grid">
 
-            <a href="https://twitter.com/sliusx" class="link-item">
-                <div class="link-left">
-                    <svg class="pixel-icon" viewBox="0 0 16 16">
-                        <path d="M2 2h4l3 4 3-4h2L9.5 8 14 14h-4l-3-4-3 4H2l4.5-6z"/>
-                    </svg>
-                    <span>x (twitter)</span>
+            <a href="./sbl.html" class="res-item">
+                <span class="res-num">02</span>
+                <div class="res-body">
+                    <span class="res-title">Science Based Lifting</span>
+                    <div class="res-meta">
+                        <span>2026</span>
+                        <span class="res-tag">hypertrophy</span>
+                        <span class="res-tag">biomechanics</span>
+                        <span class="res-tag">SBL</span>
+                    </div>
                 </div>
-                <span>@sliusx</span>
-            </a>
-
-            <a href="https://www.linkedin.com/in/thamer-almutairi-676582309/" class="link-item">
-                <div class="link-left">
-                    <svg class="pixel-icon" viewBox="0 0 16 16">
-                        <path d="M2 2h12v12H2V2zm2 3h2v2H4V5zm0 3h2v4H4V8zm4 0h2v1h1v3h-1v-2h-1v2H8V8z"/>
-                    </svg>
-                    <span>linkedin</span>
-                </div>
-                <span>connect</span>
-            </a>
-
-            <a href="https://www.tiktok.com/@itkilh" class="link-item">
-                <div class="link-left">
-                    <svg class="pixel-icon" viewBox="0 0 16 16">
-                        <path d="M10 2h2v2h2v2h-2v4h-2V6H8v4H6v-2H4v-2h4V2zM8 10v2H6v-2h2z"/>
-                    </svg>
-                    <span>tiktok</span>
-                </div>
-                <span>@itkilh</span>
-            </a>
-
-            <a href="https://instagram.com/0xth4mer" class="link-item">
-                <div class="link-left">
-                    <svg class="pixel-icon" viewBox="0 0 16 16">
-                        <path d="M3 3h10v10H3V3zm2 2v6h6V5H5zm2 2h2v2H7V7z"/>
-                    </svg>
-                    <span>instagram</span>
-                </div>
-                <span>@0xth4mer</span>
+                <span class="res-arrow">→</span>
             </a>
 
         </div>
     </section>
 
-</main>
+    <section class="rv" style="--d:.22s">
+        <div class="slabel">links</div>
+        <div class="links-wrap">
 
+            <a href="https://twitter.com/PwnTheCity" target="_blank" class="lnk featured">
+                <svg class="lnk-ico" viewBox="0 0 16 16"><path d="M2 2h4l3 4 3-4h2L9.5 8 14 14h-4l-3-4-3 4H2l4.5-6z"/></svg>
+                <span class="lnk-name txt-purple">PwnTheCity</span>
+                <span class="role-tag-small">CO FOUNDER</span>
+                <span class="lnk-handle txt-purple">@PwnTheCity</span>
+                <span class="lnk-arr">→</span>
+            </a>
+
+            <a href="https://twitter.com/sliusx" target="_blank" class="lnk">
+                <svg class="lnk-ico" viewBox="0 0 16 16"><path d="M2 2h4l3 4 3-4h2L9.5 8 14 14h-4l-3-4-3 4H2l4.5-6z"/></svg>
+                <span class="lnk-name">x twitter</span>
+                <span class="lnk-handle">@sliusx</span>
+                <span class="lnk-arr">→</span>
+            </a>
+
+            <a href="https://instagram.com/0xth4mer" target="_blank" class="lnk">
+                <svg class="lnk-ico" viewBox="0 0 16 16"><path d="M3 3h10v10H3V3zm2 2v6h6V5H5zm2 2h2v2H7V7z"/></svg>
+                <span class="lnk-name">instagram</span>
+                <span class="lnk-handle">@0xth4mer</span>
+                <span class="lnk-arr">→</span>
+            </a>
+
+            <a href="https://www.youtube.com/@ur.." target="_blank" class="lnk">
+                <svg class="lnk-ico" viewBox="0 0 24 24"><path d="M21.582 6.186a2.63 2.63 0 0 0-1.85-1.85C18.102 3.9 12 3.9 12 3.9s-6.102 0-7.732.436a2.63 2.63 0 0 0-1.85 1.85C2 7.818 2 12 2 12s0 4.182.418 5.814a2.63 2.63 0 0 0 1.85 1.85C5.898 20.1 12 20.1 12 20.1s6.102 0 7.732-.436a2.63 2.63 0 0 0 1.85-1.85C22 16.182 22 12 22 12s0-4.182-.418-5.814zM9.99 15.428V8.572L15.938 12 9.99 15.428z"/></svg>
+                <span class="lnk-name">youtube</span>
+                <span class="lnk-handle">@..ur</span>
+                <span class="lnk-arr">→</span>
+            </a>
+
+            <a href="https://www.tiktok.com/@itkilh" target="_blank" class="lnk">
+                <svg class="lnk-ico" viewBox="0 0 16 16"><path d="M10 2h2v2h2v2h-2v4h-2V6H8v4H6v-2H4v-2h4V2zM8 10v2H6v-2h2z"/></svg>
+                <span class="lnk-name">tiktok</span>
+                <span class="lnk-handle">@itkilh</span>
+                <span class="lnk-arr">→</span>
+            </a>
+
+            <a href="https://www.linkedin.com/in/thamer-almutairi-676582309/" target="_blank" class="lnk">
+                <svg class="lnk-ico" viewBox="0 0 16 16"><path d="M2 2h12v12H2V2zm2 3h2v2H4V5zm0 3h2v4H4V8zm4 0h2v1h1v3h-1v-2h-1v2H8V8z"/></svg>
+                <span class="lnk-name">linkedin</span>
+                <span class="lnk-handle">connect</span>
+                <span class="lnk-arr">→</span>
+            </a>
+
+        </div>
+    </section>
+
+    <footer class="rv" style="--d:.26s">
+        <span class="footer-l">thamer almutairi | 2026</span>
+
+    </footer>
+
+</div><script>
+/* ═══════════════════════════════════
+   INTERSECTION REVEAL
+═══════════════════════════════════ */
+const rvObs = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+        if (!e.isIntersecting) return;
+        const delay = parseFloat(e.target.style.getPropertyValue("--d") || 0) * 1000;
+        setTimeout(() => e.target.classList.add("in"), delay);
+        rvObs.unobserve(e.target);
+    });
+}, { threshold: 0.06 });
+
+document.querySelectorAll(".rv").forEach(el => rvObs.observe(el));
+
+/* ═══════════════════════════════════
+   PROGRESS BAR
+═══════════════════════════════════ */
+const PROG = 42;
+const pFill = document.getElementById("prog-fill");
+const pPct  = document.getElementById("prog-pct");
+
+const pObs = new IntersectionObserver(entries => {
+    if (!entries[0].isIntersecting) return;
+    pFill.style.width = PROG + "%";
+    let n = 0;
+    const tick = () => { if (n <= PROG) { pPct.textContent = n++ + "%"; requestAnimationFrame(tick); } };
+    tick();
+    pObs.disconnect();
+}, { threshold: 0.5 });
+
+const stackProgress = document.querySelector(".stack-progress");
+if (stackProgress) pObs.observe(stackProgress);
+</script>
 </body>
 </html>
