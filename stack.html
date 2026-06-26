@@ -1,0 +1,2019 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<meta name="description" content="Stack is Kuwait's first security research enterprise — built for the GCC. Overview of the Academy, Bug Bounty Platform, and Research division. Launching Winter 2027."/>
+<title>STACK — Security Research Enterprise · Public Overview</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Syne:wght@400;600;700;800&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500&display=swap" rel="stylesheet"/>
+
+<style>
+/* ─────────────────────────────────────────────
+   DESIGN TOKENS
+───────────────────────────────────────────── */
+:root {
+  --black:      #060609;
+  --surface:    #0a0b0e;
+  --card:       #0e0f13;
+  --panel:      #13141a;
+  --border:     rgba(255,255,255,0.06);
+  --border-h:   rgba(255,255,255,0.12);
+  --orange:     #f05a00;
+  --orange-lo:  rgba(240,90,0,0.07);
+  --orange-mid: rgba(240,90,0,0.18);
+  --white:      #f2f2f4;
+  --grey:       #4a4f5c;
+  --grey-2:     #6b7280;
+  --dim:        #1e2028;
+  --focus:      rgba(240,90,0,0.55);
+
+  --mono:    'IBM Plex Mono', monospace;
+  --display: 'Syne', sans-serif;
+  --body:    'DM Sans', sans-serif;
+
+  --nav-h:      68px;
+  --gutter:     clamp(20px, 5.5vw, 88px);
+  --section-gap: clamp(88px, 12vw, 160px);
+  --r:          2px;
+}
+
+/* ─────────────────────────────────────────────
+   RESET
+───────────────────────────────────────────── */
+*,*::before,*::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { font-size: 16px; scroll-behavior: smooth; -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility; }
+body { background: var(--black); color: var(--white); font-family: var(--body); font-weight: 300; line-height: 1.65; overflow-x: hidden; }
+a { color: inherit; text-decoration: none; }
+ul { list-style: none; }
+img { display: block; max-width: 100%; }
+button { cursor: pointer; border: none; background: none; font: inherit; color: inherit; }
+
+:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 4px;
+  border-radius: var(--r);
+}
+
+/* ─────────────────────────────────────────────
+   UTILITIES
+───────────────────────────────────────────── */
+.mono { font-family: var(--mono); }
+.container { max-width: 1280px; margin: 0 auto; padding: 0 var(--gutter); }
+
+.eyebrow {
+  font-family: var(--mono);
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--orange);
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+}
+.eyebrow::before {
+  content: '';
+  display: block;
+  width: 20px;
+  height: 1px;
+  background: var(--orange);
+  flex-shrink: 0;
+}
+
+.tag {
+  font-family: var(--mono);
+  font-size: 9px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--grey-2);
+  border: 1px solid var(--dim);
+  padding: 3px 9px;
+  border-radius: var(--r);
+  white-space: nowrap;
+}
+.tag-orange {
+  color: var(--orange);
+  border-color: rgba(240,90,0,0.3);
+  background: var(--orange-lo);
+}
+
+.divider { width: 100%; height: 1px; background: var(--border); }
+
+/* Animations */
+.reveal {
+  opacity: 0;
+  transform: translateY(22px);
+  transition: opacity 0.75s cubic-bezier(0.22,1,0.36,1),
+              transform 0.75s cubic-bezier(0.22,1,0.36,1);
+}
+.reveal.in { opacity: 1; transform: none; }
+
+.stagger > * {
+  opacity: 0;
+  transform: translateY(18px);
+  transition: opacity 0.65s cubic-bezier(0.22,1,0.36,1),
+              transform 0.65s cubic-bezier(0.22,1,0.36,1);
+}
+.stagger.in > *:nth-child(1) { transition-delay:   0ms; }
+.stagger.in > *:nth-child(2) { transition-delay:  80ms; }
+.stagger.in > *:nth-child(3) { transition-delay: 160ms; }
+.stagger.in > *:nth-child(4) { transition-delay: 240ms; }
+.stagger.in > *:nth-child(5) { transition-delay: 320ms; }
+.stagger.in > *:nth-child(6) { transition-delay: 400ms; }
+.stagger.in > * { opacity: 1; transform: none; }
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: none; }
+}
+@keyframes pulse-dot {
+  0%   { box-shadow: 0 0 0 0 rgba(240,90,0,0.4); }
+  70%  { box-shadow: 0 0 0 8px rgba(240,90,0,0); }
+  100% { box-shadow: 0 0 0 0 rgba(240,90,0,0); }
+}
+
+/* ─────────────────────────────────────────────
+   NAVIGATION
+───────────────────────────────────────────── */
+.nav {
+  position: fixed;
+  inset: 0 0 auto;
+  height: var(--nav-h);
+  z-index: 100;
+  background: rgba(6,6,9,0.84);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--border);
+  transition: background 0.3s;
+}
+.nav-inner {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 0 var(--gutter);
+  height: 100%;
+  display: flex;
+  align-items: center;
+  gap: 40px;
+}
+
+.nav-logo {
+  font-family: var(--mono);
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  color: var(--white);
+  flex-shrink: 0;
+}
+.nav-logo .b { color: var(--orange); }
+
+.nav-links {
+  display: flex;
+  align-items: center;
+  gap: 32px;
+  margin-left: auto;
+}
+.nav-links a {
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--grey);
+  transition: color 0.15s;
+}
+.nav-links a:hover,
+.nav-links a:focus-visible,
+.nav-links a.active { color: var(--white); }
+
+.nav-cta {
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--white);
+  border: 1px solid var(--border-h);
+  padding: 9px 20px;
+  border-radius: var(--r);
+  transition: border-color 0.15s, color 0.15s;
+  flex-shrink: 0;
+}
+.nav-cta:hover,
+.nav-cta:focus-visible { border-color: var(--orange); color: var(--orange); }
+
+.nav-hamburger {
+  display: none;
+  flex-direction: column;
+  gap: 5px;
+  padding: 8px;
+  margin-left: auto;
+}
+.nav-hamburger span {
+  display: block;
+  width: 22px;
+  height: 1.5px;
+  background: var(--grey-2);
+  transition: all 0.25s;
+}
+
+.nav-drawer {
+  display: none;
+  position: fixed;
+  inset: var(--nav-h) 0 0;
+  background: var(--surface);
+  z-index: 99;
+  border-top: 1px solid var(--border);
+  flex-direction: column;
+  padding: 32px var(--gutter);
+  gap: 0;
+  transform: translateX(100%);
+  transition: transform 0.3s cubic-bezier(0.22,1,0.36,1);
+  overflow-y: auto;
+}
+.nav-drawer.open { transform: translateX(0); }
+.nav-drawer a {
+  font-family: var(--mono);
+  font-size: 14px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--grey-2);
+  padding: 18px 0;
+  border-bottom: 1px solid var(--border);
+  transition: color 0.15s;
+}
+.nav-drawer a:hover { color: var(--orange); }
+
+/* ─────────────────────────────────────────────
+   HERO
+───────────────────────────────────────────── */
+.hero {
+  min-height: 100svh;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  padding-top: var(--nav-h);
+  position: relative;
+  overflow: hidden;
+  border-bottom: 1px solid var(--border);
+}
+
+#heroCanvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0.3;
+  pointer-events: none;
+}
+
+.hero::after {
+  content: '';
+  position: absolute;
+  top: var(--nav-h);
+  left: var(--gutter);
+  width: 1px;
+  height: clamp(60px, 12vh, 120px);
+  background: var(--orange);
+  opacity: 0.6;
+  animation: fadeUp 1s 0.1s both;
+}
+
+.hero-inner {
+  position: relative;
+  z-index: 2;
+  max-width: 1280px;
+  width: 100%;
+  margin: 0 auto;
+  padding: 0 var(--gutter) clamp(48px, 8vh, 88px);
+  display: grid;
+  grid-template-columns: 1fr max-content;
+  align-items: flex-end;
+  gap: 40px;
+}
+
+.hero-eyebrow { margin-bottom: 32px; animation: fadeUp 0.8s 0.2s both; }
+
+.hero-h1 {
+  font-family: var(--display);
+  font-size: clamp(48px, 8.5vw, 120px);
+  font-weight: 800;
+  line-height: 0.93;
+  letter-spacing: -0.03em;
+  color: var(--white);
+  margin-bottom: 36px;
+  animation: fadeUp 0.8s 0.35s both;
+}
+.hero-h1 em { font-style: italic; color: var(--orange); font-weight: 700; }
+
+.hero-sub {
+  font-size: clamp(14px, 1.4vw, 16px);
+  color: var(--grey-2);
+  max-width: 500px;
+  line-height: 1.8;
+  margin-bottom: 48px;
+  font-weight: 300;
+  animation: fadeUp 0.8s 0.5s both;
+}
+
+.hero-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 44px;
+  animation: fadeUp 0.8s 0.6s both;
+}
+
+.hero-ctas {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  animation: fadeUp 0.8s 0.7s both;
+}
+
+.btn-primary {
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: #fff;
+  background: var(--orange);
+  padding: 13px 28px;
+  border-radius: var(--r);
+  transition: opacity 0.15s;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+.btn-primary:hover,
+.btn-primary:focus-visible { opacity: 0.82; }
+
+.btn-outline {
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--white);
+  border: 1px solid var(--border-h);
+  padding: 13px 28px;
+  border-radius: var(--r);
+  transition: border-color 0.15s, color 0.15s;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+.btn-outline:hover,
+.btn-outline:focus-visible { border-color: var(--orange); color: var(--orange); }
+
+.hero-right {
+  text-align: right;
+  padding-bottom: 8px;
+  animation: fadeUp 0.8s 0.5s both;
+}
+.hero-coord {
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.15em;
+  color: var(--grey);
+  line-height: 2;
+}
+.hero-coord strong {
+  display: block;
+  font-family: var(--display);
+  font-size: clamp(28px, 4vw, 52px);
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  color: var(--white);
+  line-height: 1;
+  margin-bottom: 12px;
+}
+
+.hero-strip {
+  position: relative;
+  z-index: 2;
+  max-width: 1280px;
+  width: 100%;
+  margin: 0 auto;
+  padding: 0 var(--gutter);
+  border-top: 1px solid var(--border);
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  animation: fadeUp 0.8s 0.85s both;
+}
+.hs-item {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 20px 0;
+  border-right: 1px solid var(--border);
+  padding-right: 28px;
+  text-decoration: none;
+  transition: background 0.15s;
+}
+.hs-item:last-child { border-right: none; }
+.hs-item:hover .hs-name,
+.hs-item:focus-visible .hs-name { color: var(--orange); }
+.hs-num { font-family: var(--mono); font-size: 10px; color: var(--orange); flex-shrink: 0; }
+.hs-name { font-family: var(--mono); font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--white); transition: color 0.15s; flex: 1; }
+.hs-eta  { font-family: var(--mono); font-size: 10px; color: var(--grey); }
+
+/* ─────────────────────────────────────────────
+   SECTION WRAPPER
+───────────────────────────────────────────── */
+.section { padding: var(--section-gap) 0; border-bottom: 1px solid var(--border); }
+.section--dark { background: var(--surface); }
+
+.sec-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 24px;
+  margin-bottom: clamp(40px, 6vw, 72px);
+  flex-wrap: wrap;
+}
+.sec-eyebrow { margin-bottom: 18px; }
+.sec-title {
+  font-family: var(--display);
+  font-size: clamp(30px, 4vw, 52px);
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  line-height: 1.05;
+  color: var(--white);
+}
+.sec-desc {
+  font-size: 15px;
+  line-height: 1.8;
+  color: var(--grey-2);
+  max-width: 520px;
+  margin-top: 16px;
+}
+
+/* ─────────────────────────────────────────────
+   VISION
+───────────────────────────────────────────── */
+.vision-grid {
+  display: grid;
+  grid-template-columns: 1.1fr 1fr;
+  gap: clamp(48px, 7vw, 100px);
+  align-items: center;
+}
+.vision-statement {
+  font-family: var(--display);
+  font-size: clamp(22px, 3vw, 36px);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1.25;
+  color: var(--white);
+  margin-bottom: 24px;
+}
+.vision-statement span { color: var(--orange); }
+.vision-body { font-size: 15px; line-height: 1.8; color: var(--grey-2); max-width: 500px; }
+
+.vision-pillars {
+  display: flex;
+  flex-direction: column;
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  overflow: hidden;
+}
+.vp-row {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  padding: 22px 24px;
+  border-bottom: 1px solid var(--border);
+  transition: background 0.15s;
+}
+.vp-row:last-child { border-bottom: none; }
+.vp-row:hover { background: var(--card); }
+.vp-num  { font-family: var(--mono); font-size: 10px; color: var(--orange); flex-shrink: 0; width: 24px; }
+.vp-text { font-size: 14px; color: var(--white); flex: 1; line-height: 1.5; }
+.vp-arrow { font-size: 12px; color: var(--grey); transition: color 0.15s, transform 0.15s; }
+.vp-row:hover .vp-arrow { color: var(--orange); transform: translateX(4px); }
+
+/* ─────────────────────────────────────────────
+   DIVISIONS
+───────────────────────────────────────────── */
+.divisions-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1px;
+  background: var(--border);
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  overflow: hidden;
+}
+.div-card {
+  background: var(--card);
+  padding: clamp(28px, 4vw, 48px);
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  position: relative;
+  transition: background 0.2s;
+  overflow: hidden;
+  text-decoration: none;
+}
+.div-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 1px;
+  background: var(--orange);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.35s cubic-bezier(0.22,1,0.36,1);
+}
+.div-card:hover,
+.div-card:focus-visible { background: var(--panel); }
+.div-card:hover::before,
+.div-card:focus-visible::before { transform: scaleX(1); }
+
+.div-top  { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
+.div-icon {
+  width: 40px; height: 40px;
+  border: 1px solid var(--dim);
+  display: flex; align-items: center; justify-content: center;
+  border-radius: var(--r); flex-shrink: 0;
+}
+.div-icon svg { width: 18px; height: 18px; stroke: var(--orange); fill: none; stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; }
+
+.div-title { font-family: var(--display); font-size: 20px; font-weight: 700; letter-spacing: -0.02em; color: var(--white); }
+.div-desc  { font-size: 13px; line-height: 1.75; color: var(--grey-2); flex: 1; }
+.div-footer { display: flex; align-items: center; justify-content: space-between; padding-top: 20px; border-top: 1px solid var(--border); }
+.div-arrow { font-family: var(--mono); font-size: 11px; color: var(--grey); transition: color 0.15s; }
+.div-card:hover .div-arrow,
+.div-card:focus-visible .div-arrow { color: var(--orange); }
+
+/* ─────────────────────────────────────────────
+   ACADEMY
+───────────────────────────────────────────── */
+.ac-layout { display: grid; grid-template-columns: 1fr 1.5fr; gap: clamp(48px, 7vw, 100px); align-items: start; }
+.ac-kicker { font-family: var(--display); font-size: clamp(28px, 3.5vw, 48px); font-weight: 800; letter-spacing: -0.03em; line-height: 1.1; color: var(--white); margin-top: 20px; margin-bottom: 24px; }
+.ac-kicker em { color: var(--orange); font-style: normal; }
+.ac-body { font-size: 14px; line-height: 1.8; color: var(--grey-2); margin-bottom: 28px; }
+
+.ac-formats {
+  display: flex;
+  flex-direction: column;
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  overflow: hidden;
+  margin-bottom: 20px;
+}
+.ac-fmt { padding: 16px 20px; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 14px; }
+.ac-fmt:last-child { border-bottom: none; }
+.ac-fmt-dot { width: 5px; height: 5px; background: var(--orange); border-radius: 50%; flex-shrink: 0; }
+.ac-fmt-name { font-size: 13px; color: var(--white); font-weight: 400; flex: 1; }
+.ac-fmt-sub  { font-family: var(--mono); font-size: 10px; letter-spacing: 0.1em; color: var(--grey); }
+
+.ac-pricing {
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  color: var(--grey-2);
+  border: 1px solid var(--border);
+  padding: 16px 20px;
+  border-radius: var(--r);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.ac-pricing strong { color: var(--white); font-size: 13px; }
+
+/* Academy tracks right column */
+.ac-tracks {
+  display: flex;
+  flex-direction: column;
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  overflow: hidden;
+}
+.ac-track {
+  padding: 24px 28px;
+  border-bottom: 1px solid var(--border);
+  transition: background 0.15s;
+  cursor: default;
+}
+.ac-track:last-child { border-bottom: none; }
+.ac-track:hover { background: var(--card); }
+.at-head { display: flex; align-items: center; gap: 16px; margin-bottom: 10px; }
+.at-num  { font-family: var(--mono); font-size: 9px; letter-spacing: 0.18em; color: var(--orange); flex-shrink: 0; }
+.at-name { font-family: var(--display); font-size: 17px; font-weight: 700; letter-spacing: -0.01em; color: var(--white); }
+.at-desc { font-size: 13px; line-height: 1.7; color: var(--grey-2); padding-left: 56px; }
+
+/* Curriculum pills */
+.ac-curriculum {
+  padding: 24px 28px;
+  border-bottom: 1px solid var(--border);
+  background: var(--surface);
+}
+.ac-curriculum-label { font-family: var(--mono); font-size: 9px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--grey); margin-bottom: 14px; }
+.ac-pills { display: flex; flex-wrap: wrap; gap: 6px; }
+
+/* ─────────────────────────────────────────────
+   RESEARCH BOOTCAMP
+───────────────────────────────────────────── */
+.bootcamp-band {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  padding: var(--section-gap) 0;
+}
+.bootcamp-inner {
+  display: grid;
+  grid-template-columns: 1fr 1.4fr;
+  gap: clamp(48px, 7vw, 100px);
+  align-items: start;
+}
+.bc-kicker {
+  font-family: var(--display);
+  font-size: clamp(28px, 3.5vw, 48px);
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  line-height: 1.1;
+  color: var(--white);
+  margin-top: 20px;
+  margin-bottom: 20px;
+}
+.bc-kicker em { color: var(--orange); font-style: normal; }
+.bc-meta { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 20px; }
+.bc-body { font-size: 14px; line-height: 1.8; color: var(--grey-2); margin-bottom: 24px; }
+.bc-disclaimer {
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  color: var(--grey);
+  line-height: 1.7;
+  border-left: 2px solid var(--dim);
+  padding-left: 14px;
+}
+
+.bc-topics {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1px;
+  background: var(--border);
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  overflow: hidden;
+}
+.bc-topic {
+  background: var(--card);
+  padding: 22px 24px;
+  transition: background 0.15s;
+}
+.bc-topic:hover { background: var(--panel); }
+.bc-topic-label { font-family: var(--mono); font-size: 9px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--orange); margin-bottom: 8px; }
+.bc-topic-text  { font-size: 13px; line-height: 1.65; color: var(--grey-2); }
+
+/* ─────────────────────────────────────────────
+   BUG BOUNTY PLATFORM
+───────────────────────────────────────────── */
+.bb-layout  { display: grid; grid-template-columns: 1fr 1.5fr; gap: clamp(48px, 7vw, 100px); align-items: start; }
+.bb-kicker  { font-family: var(--display); font-size: clamp(36px, 5vw, 64px); font-weight: 800; letter-spacing: -0.03em; line-height: 1.0; color: var(--white); margin-top: 20px; margin-bottom: 24px; }
+.bb-kicker span { color: var(--orange); display: block; }
+.bb-body    { font-size: 14px; line-height: 1.8; color: var(--grey-2); margin-bottom: 28px; }
+.bb-regions { display: flex; flex-wrap: wrap; gap: 6px; }
+
+.bb-pillars {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1px;
+  background: var(--border);
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  overflow: hidden;
+}
+.bb-pillar { background: var(--card); padding: 28px 24px; transition: background 0.15s; }
+.bb-pillar:hover { background: var(--panel); }
+.bp-label { font-family: var(--mono); font-size: 9px; letter-spacing: 0.22em; text-transform: uppercase; color: var(--orange); margin-bottom: 10px; }
+.bp-text  { font-size: 13px; line-height: 1.7; color: var(--grey-2); }
+
+/* ─────────────────────────────────────────────
+   TIMELINE
+───────────────────────────────────────────── */
+.timeline-wrap { position: relative; }
+
+.timeline-track {
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  gap: 0;
+}
+.timeline-track::before {
+  content: '';
+  position: absolute;
+  top: 0; bottom: 0;
+  left: 20px;
+  width: 1px;
+  background: var(--border);
+}
+
+.tl-item {
+  display: grid;
+  grid-template-columns: 44px 1fr;
+  gap: 24px;
+  padding: 28px 0;
+  border-bottom: 1px solid var(--border);
+  position: relative;
+  opacity: 0;
+  transform: translateX(-12px);
+  transition: opacity 0.6s cubic-bezier(0.22,1,0.36,1),
+              transform 0.6s cubic-bezier(0.22,1,0.36,1);
+}
+.tl-item:last-child { border-bottom: none; }
+.tl-item.in { opacity: 1; transform: none; }
+.tl-item:nth-child(1).in { transition-delay:   0ms; }
+.tl-item:nth-child(2).in { transition-delay:  80ms; }
+.tl-item:nth-child(3).in { transition-delay: 160ms; }
+.tl-item:nth-child(4).in { transition-delay: 240ms; }
+.tl-item:nth-child(5).in { transition-delay: 320ms; }
+.tl-item:nth-child(6).in { transition-delay: 400ms; }
+.tl-item:nth-child(7).in { transition-delay: 480ms; }
+
+.tl-dot {
+  width: 40px;
+  height: 40px;
+  border: 1px solid var(--dim);
+  background: var(--card);
+  border-radius: var(--r);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  position: relative;
+  z-index: 1;
+}
+.tl-dot.active { border-color: rgba(240,90,0,0.4); background: var(--orange-lo); }
+.tl-dot-inner {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--grey);
+}
+.tl-dot.active .tl-dot-inner { background: var(--orange); }
+
+.tl-content { padding-top: 8px; }
+.tl-phase   { font-family: var(--mono); font-size: 9px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--grey); margin-bottom: 6px; }
+.tl-name    { font-family: var(--display); font-size: 18px; font-weight: 700; letter-spacing: -0.01em; color: var(--white); margin-bottom: 8px; }
+.tl-desc    { font-size: 13px; line-height: 1.7; color: var(--grey-2); }
+.tl-eta     { margin-top: 10px; }
+
+/* ─────────────────────────────────────────────
+   RESEARCH
+───────────────────────────────────────────── */
+.re-intro { font-size: 15px; line-height: 1.8; color: var(--grey-2); max-width: 600px; margin-bottom: clamp(36px, 5vw, 56px); }
+
+.re-categories {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1px;
+  background: var(--border);
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  overflow: hidden;
+  margin-bottom: 1px;
+}
+.re-cat {
+  background: var(--card);
+  padding: 28px 28px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  transition: background 0.15s;
+}
+.re-cat:hover { background: var(--panel); }
+.re-cat-label { font-family: var(--mono); font-size: 9px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--orange); }
+.re-cat-name  { font-family: var(--display); font-size: 17px; font-weight: 700; letter-spacing: -0.01em; color: var(--white); }
+.re-cat-desc  { font-size: 13px; line-height: 1.65; color: var(--grey-2); flex: 1; }
+.re-cat-footer { display: flex; align-items: center; justify-content: space-between; padding-top: 16px; border-top: 1px solid var(--border); }
+
+.re-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1px;
+  background: var(--border);
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  overflow: hidden;
+}
+.re-paper {
+  background: var(--card);
+  padding: 28px 28px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  transition: background 0.15s;
+  position: relative;
+}
+.re-paper:hover { background: var(--panel); }
+.rp-top    { display: flex; align-items: center; justify-content: space-between; }
+.rp-id     { font-family: var(--mono); font-size: 10px; letter-spacing: 0.14em; color: var(--grey); }
+.rp-soon   { font-family: var(--mono); font-size: 9px; letter-spacing: 0.18em; font-weight: 600; background: transparent; border: 1px solid var(--dim); color: var(--grey-2); padding: 3px 10px; border-radius: var(--r); text-transform: uppercase; }
+.rp-title  { font-family: var(--display); font-size: 17px; font-weight: 700; letter-spacing: -0.01em; line-height: 1.3; color: var(--white); }
+.rp-abstract { font-size: 13px; line-height: 1.7; color: var(--grey-2); flex: 1; }
+.rp-tags   { display: flex; flex-wrap: wrap; gap: 6px; margin-top: auto; }
+
+/* ─────────────────────────────────────────────
+   PHILOSOPHY
+───────────────────────────────────────────── */
+.philosophy-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1px;
+  background: var(--border);
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  overflow: hidden;
+}
+.ph-card {
+  background: var(--card);
+  padding: 36px 32px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  transition: background 0.15s;
+}
+.ph-card:hover { background: var(--panel); }
+.ph-num    { font-family: var(--mono); font-size: 9px; letter-spacing: 0.2em; color: var(--orange); }
+.ph-principle {
+  font-family: var(--display);
+  font-size: clamp(17px, 2vw, 22px);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1.25;
+  color: var(--white);
+}
+.ph-body { font-size: 13px; line-height: 1.75; color: var(--grey-2); }
+
+/* ─────────────────────────────────────────────
+   LEADERSHIP
+───────────────────────────────────────────── */
+.team-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1px;
+  background: var(--border);
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  overflow: hidden;
+}
+.member {
+  background: var(--card);
+  padding: clamp(24px, 3.5vw, 44px);
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  transition: background 0.15s;
+  position: relative;
+  overflow: hidden;
+}
+.member::after {
+  content: '';
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  height: 1px;
+  background: var(--orange);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.35s cubic-bezier(0.22,1,0.36,1);
+}
+.member:hover,
+.member:focus-within { background: var(--panel); }
+.member:hover::after,
+.member:focus-within::after { transform: scaleX(1); }
+
+.member-initial {
+  width: 44px; height: 44px;
+  border: 1px solid rgba(240,90,0,0.25);
+  background: var(--orange-lo);
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--display); font-size: 16px; font-weight: 800;
+  color: var(--orange); border-radius: var(--r); flex-shrink: 0;
+}
+.member-role { font-family: var(--mono); font-size: 9px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--orange); }
+.member-name { font-family: var(--display); font-size: clamp(17px, 2vw, 22px); font-weight: 700; letter-spacing: -0.02em; line-height: 1.2; color: var(--white); }
+.member-bio  { font-size: 12px; line-height: 1.7; color: var(--grey-2); flex: 1; }
+.member-link {
+  font-family: var(--mono); font-size: 11px; color: var(--grey);
+  display: inline-flex; align-items: center; gap: 5px;
+  transition: color 0.15s; margin-top: auto;
+}
+a.member-link:hover,
+a.member-link:focus-visible { color: var(--orange); }
+.member-link svg { width: 10px; height: 10px; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.member-link-placeholder { opacity: 0; pointer-events: none; }
+
+/* ─────────────────────────────────────────────
+   CTA BAND
+───────────────────────────────────────────── */
+.cta-band { padding: clamp(60px, 8vw, 100px) 0; border-bottom: 1px solid var(--border); background: var(--surface); }
+.cta-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 40px;
+  flex-wrap: wrap;
+}
+.cta-headline { font-family: var(--display); font-size: clamp(26px, 3.5vw, 44px); font-weight: 800; letter-spacing: -0.03em; line-height: 1.1; color: var(--white); }
+.cta-headline span { color: var(--orange); }
+.cta-right   { display: flex; flex-direction: column; gap: 12px; align-items: flex-end; }
+.cta-email   { font-family: var(--display); font-size: clamp(16px, 2vw, 24px); font-weight: 700; letter-spacing: -0.02em; color: var(--white); transition: color 0.15s; }
+.cta-email:hover,
+.cta-email:focus-visible { color: var(--orange); }
+.cta-social  { display: flex; align-items: center; gap: 6px; }
+.cs-link     { font-family: var(--mono); font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--grey); border: 1px solid var(--dim); padding: 7px 14px; border-radius: var(--r); transition: border-color 0.15s, color 0.15s; }
+.cs-link:hover,
+.cs-link:focus-visible { border-color: var(--border-h); color: var(--white); }
+
+/* ─────────────────────────────────────────────
+   FOOTER
+───────────────────────────────────────────── */
+footer {
+  padding: 0;
+  background: var(--surface);
+  border-top: 1px solid var(--border);
+}
+.footer-top {
+  padding: 48px 0 40px;
+  border-bottom: 1px solid var(--border);
+}
+.footer-cols {
+  display: grid;
+  grid-template-columns: 1.5fr repeat(4, 1fr);
+  gap: clamp(24px, 4vw, 60px);
+}
+.ft-brand { }
+.ft-logo  { font-family: var(--mono); font-size: 15px; font-weight: 600; color: var(--white); display: block; margin-bottom: 14px; }
+.ft-logo .b { color: var(--orange); }
+.ft-tagline { font-size: 13px; line-height: 1.7; color: var(--grey-2); max-width: 220px; }
+
+.footer-col-title { font-family: var(--mono); font-size: 9px; letter-spacing: 0.22em; text-transform: uppercase; color: var(--grey); margin-bottom: 18px; }
+.footer-col ul { display: flex; flex-direction: column; gap: 10px; }
+.footer-col a {
+  font-size: 13px;
+  color: var(--grey-2);
+  transition: color 0.15s;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.footer-col a:hover,
+.footer-col a:focus-visible { color: var(--white); }
+.footer-col .soon-tag {
+  font-family: var(--mono);
+  font-size: 8px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--grey);
+  border: 1px solid var(--dim);
+  padding: 1px 6px;
+  border-radius: var(--r);
+}
+
+.footer-bottom {
+  padding: 20px 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+.ft-copy   { font-family: var(--mono); font-size: 10px; letter-spacing: 0.1em; color: var(--grey); }
+.ft-coord  { font-family: var(--mono); font-size: 10px; letter-spacing: 0.15em; color: var(--dim); }
+
+/* ─────────────────────────────────────────────
+   RESPONSIVE
+───────────────────────────────────────────── */
+@media (max-width: 1200px) {
+  .footer-cols { grid-template-columns: 1fr 1fr; gap: 40px 60px; }
+  .ft-brand    { grid-column: 1 / -1; }
+}
+
+@media (max-width: 1024px) {
+  .team-grid         { grid-template-columns: repeat(2, 1fr); }
+  .philosophy-grid   { grid-template-columns: repeat(2, 1fr); }
+  .re-categories     { grid-template-columns: repeat(2, 1fr); }
+}
+
+@media (max-width: 860px) {
+  .nav-links, .nav-cta { display: none; }
+  .nav-hamburger { display: flex; }
+  .nav-drawer    { display: flex; }
+
+  .hero-inner { grid-template-columns: 1fr; }
+  .hero-right { display: none; }
+  .hero-strip { grid-template-columns: repeat(2, 1fr); }
+  .hs-item:nth-child(3),
+  .hs-item:nth-child(4) { border-top: 1px solid var(--border); }
+  .hs-item:nth-child(2) { border-right: none; }
+  .hs-item:nth-child(4) { border-right: none; }
+
+  .vision-grid,
+  .divisions-grid,
+  .bb-layout,
+  .ac-layout,
+  .bootcamp-inner  { grid-template-columns: 1fr; }
+
+  .divisions-grid  { grid-template-columns: 1fr; }
+  .team-grid       { grid-template-columns: 1fr 1fr; }
+  .re-categories,
+  .re-grid         { grid-template-columns: 1fr; }
+  .philosophy-grid { grid-template-columns: 1fr; }
+  .bc-topics       { grid-template-columns: 1fr; }
+
+  .cta-inner  { flex-direction: column; align-items: flex-start; }
+  .cta-right  { align-items: flex-start; }
+  .footer-cols { grid-template-columns: 1fr 1fr; }
+  .ft-brand    { grid-column: 1 / -1; }
+  .footer-bottom { flex-direction: column; align-items: flex-start; gap: 6px; }
+}
+
+@media (max-width: 520px) {
+  :root { --gutter: 20px; }
+  .team-grid         { grid-template-columns: 1fr; }
+  .hero-h1           { font-size: clamp(40px, 12vw, 72px); }
+  .sec-title         { font-size: clamp(26px, 7vw, 38px); }
+  .hero-ctas         { flex-direction: column; }
+  .btn-primary,
+  .btn-outline       { width: 100%; justify-content: center; }
+  .bb-pillars,
+  .bc-topics         { grid-template-columns: 1fr; }
+  .hero-strip        { grid-template-columns: 1fr; }
+  .hs-item           { border-right: none; border-bottom: 1px solid var(--border); }
+  .hs-item:last-child { border-bottom: none; }
+  .footer-cols       { grid-template-columns: 1fr; }
+  .philosophy-grid,
+  .re-categories,
+  .re-grid           { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+
+<!-- ══ NAVIGATION ════════════════════════════ -->
+<header class="nav" id="nav">
+  <div class="nav-inner">
+    <a href="#" class="nav-logo" aria-label="Stack — Home">
+      <span class="b">[</span>STACK<span class="b">]</span>
+    </a>
+    <nav aria-label="Primary Navigation">
+      <ul class="nav-links">
+        <li><a href="#academy">Academy</a></li>
+        <li><a href="#platform">Platform</a></li>
+        <li><a href="#research">Research</a></li>
+        <li><a href="#timeline">Roadmap</a></li>
+        <li><a href="#team">Leadership</a></li>
+      </ul>
+    </nav>
+    <button class="nav-hamburger" id="hamburger" aria-label="Open menu" aria-expanded="false">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+</header>
+
+<nav class="nav-drawer" id="drawer" aria-label="Mobile Navigation">
+  <a href="#academy"  onclick="closeDrawer()">Academy</a>
+  <a href="#platform" onclick="closeDrawer()">Platform</a>
+  <a href="#research" onclick="closeDrawer()">Research</a>
+  <a href="#timeline" onclick="closeDrawer()">Roadmap</a>
+  <a href="#team"     onclick="closeDrawer()">Leadership</a>
+  <a href="mailto:hello@stacksec.io" onclick="closeDrawer()">Contact</a>
+</nav>
+
+<main>
+
+<!-- ══ HERO ══════════════════════════════════ -->
+<section class="hero" id="hero" aria-labelledby="hero-heading">
+  <canvas id="heroCanvas" aria-hidden="true"></canvas>
+
+  <div class="hero-inner">
+    <div class="hero-left">
+      <div class="eyebrow hero-eyebrow">Public Overview · Kuwait</div>
+      <h1 class="hero-h1" id="hero-heading">
+        Security<br/>
+        <em>Research</em><br/>
+        Enterprise.
+      </h1>
+      <p class="hero-sub">
+        Stack is Kuwait's first practitioner-led security research organization —
+        building the educational infrastructure, research capability, and vulnerability
+        coordination platform the GCC security community deserves.
+      </p>
+      <div class="hero-meta">
+        <span class="tag tag-orange">Launching Winter 2027</span>
+        <span class="tag">Built in Kuwait</span>
+        <span class="tag">Designed for the GCC</span>
+      </div>
+      <div class="hero-ctas">
+        <a href="#academy"  class="btn-primary">Explore Academy →</a>
+        <a href="#platform" class="btn-outline">Bug Bounty Platform</a>
+      </div>
+    </div>
+    <div class="hero-right" aria-hidden="true">
+      <div class="hero-coord">
+        <strong>KW</strong>
+        KUWAIT<br/>
+        29.3759° N<br/>
+        47.9774° E<br/>
+        ETA — W2027
+      </div>
+    </div>
+  </div>
+
+  <div class="hero-strip" aria-label="Section index">
+    <a href="#academy" class="hs-item">
+      <span class="hs-num">01</span>
+      <span class="hs-name">Academy</span>
+      <span class="hs-eta">W2027</span>
+    </a>
+    <a href="#platform" class="hs-item">
+      <span class="hs-num">02</span>
+      <span class="hs-name">Bug Bounty Platform</span>
+      <span class="hs-eta">Post-Academy</span>
+    </a>
+    <a href="#research" class="hs-item">
+      <span class="hs-num">03</span>
+      <span class="hs-name">Research</span>
+      <span class="hs-eta">Ongoing</span>
+    </a>
+    <a href="#team" class="hs-item">
+      <span class="hs-num">04</span>
+      <span class="hs-name">Leadership</span>
+      <span class="hs-eta">Kuwait</span>
+    </a>
+  </div>
+</section>
+
+<!-- ══ VISION ════════════════════════════════ -->
+<section class="section" id="vision" aria-labelledby="vision-heading">
+  <div class="container">
+    <div class="vision-grid">
+      <div class="vision-left reveal">
+        <div class="eyebrow sec-eyebrow">Mission</div>
+        <p class="vision-statement" id="vision-heading">
+          Building the <span>GCC's security</span><br/>infrastructure from Kuwait.
+        </p>
+        <p class="vision-body">
+          Stack was founded on the premise that the Gulf region deserves a native,
+          practitioner-led security ecosystem. Not imported platforms, not outsourced
+          expertise — a regional institution built here, owned here, and trusted here.
+        </p>
+      </div>
+      <div class="vision-right reveal">
+        <div class="vision-pillars stagger">
+          <div class="vp-row">
+            <span class="vp-num">01</span>
+            <span class="vp-text">GCC-native bug bounty ecosystem with verified researchers and private programs</span>
+            <span class="vp-arrow">→</span>
+          </div>
+          <div class="vp-row">
+            <span class="vp-num">02</span>
+            <span class="vp-text">Offensive security education from foundations to advanced level — no shortcuts</span>
+            <span class="vp-arrow">→</span>
+          </div>
+          <div class="vp-row">
+            <span class="vp-num">03</span>
+            <span class="vp-text">Original security research and vulnerability analysis for the regional landscape</span>
+            <span class="vp-arrow">→</span>
+          </div>
+          <div class="vp-row">
+            <span class="vp-num">04</span>
+            <span class="vp-text">A trusted institution that raises the GCC's security maturity over time</span>
+            <span class="vp-arrow">→</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ DIVISIONS ═════════════════════════════ -->
+<section class="section section--dark" id="divisions" aria-labelledby="div-heading">
+  <div class="container">
+    <div class="sec-header reveal">
+      <div class="sec-header-left">
+        <div class="eyebrow sec-eyebrow">Core Divisions</div>
+        <h2 class="sec-title" id="div-heading" style="margin-top:18px">Three pillars.<br/>One mission.</h2>
+      </div>
+    </div>
+    <div class="divisions-grid stagger">
+
+      <a href="#academy" class="div-card">
+        <div class="div-top">
+          <div class="div-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg>
+          </div>
+          <span class="tag tag-orange">Winter 2027</span>
+        </div>
+        <div>
+          <div class="div-title">Stack Academy</div>
+        </div>
+        <p class="div-desc">
+          A structured education program covering the full spectrum of offensive security —
+          from system fundamentals to advanced research. Online cohorts and intensive
+          in-person bootcamps in Kuwait.
+        </p>
+        <div class="div-footer">
+          <span class="tag">Kuwait</span>
+          <span class="div-arrow mono">Explore →</span>
+        </div>
+      </a>
+
+      <a href="#platform" class="div-card">
+        <div class="div-top">
+          <div class="div-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+          </div>
+          <span class="tag">Post-Academy</span>
+        </div>
+        <div>
+          <div class="div-title">Bug Bounty Platform</div>
+        </div>
+        <p class="div-desc">
+          A closed vulnerability rewards platform built exclusively for GCC organisations
+          and verified regional researchers. Private programs, regional scope, transparent
+          payout structures.
+        </p>
+        <div class="div-footer">
+          <span class="tag">GCC Only</span>
+          <span class="div-arrow mono">Explore →</span>
+        </div>
+      </a>
+
+      <a href="#research" class="div-card">
+        <div class="div-top">
+          <div class="div-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+          </div>
+          <span class="tag">Ongoing</span>
+        </div>
+        <div>
+          <div class="div-title">Research</div>
+        </div>
+        <p class="div-desc">
+          Original vulnerability research, regional threat intelligence, security advisories,
+          and open source tooling — conducted by practitioners and published for the community.
+        </p>
+        <div class="div-footer">
+          <span class="tag">Publications</span>
+          <span class="div-arrow mono">Explore →</span>
+        </div>
+      </a>
+
+    </div>
+  </div>
+</section>
+
+<!-- ══ ACADEMY ═══════════════════════════════ -->
+<section class="section" id="academy" aria-labelledby="ac-heading">
+  <div class="container">
+    <div class="ac-layout">
+
+      <div class="ac-left reveal">
+        <div class="eyebrow">Stack Academy</div>
+        <h2 class="ac-kicker" id="ac-heading">
+          Understand systems.<br/>
+          <em>Then exploit them.</em>
+        </h2>
+        <p class="ac-body">
+          Stack Academy launches Winter 2027. The curriculum is designed to build
+          deep technical understanding before introducing offensive techniques.
+          Students move through structured learning paths at a measured pace —
+          each level reinforces the one before it.
+        </p>
+        <p class="ac-body">
+          Taught by experienced practitioners. Delivered online and through
+          intensive in-person bootcamps in Kuwait, using Stack's own private lab
+          infrastructure. Cohorts are kept small to allow meaningful instructor
+          interaction.
+        </p>
+
+        <div class="ac-formats">
+          <div class="ac-fmt">
+            <span class="ac-fmt-dot" aria-hidden="true"></span>
+            <span class="ac-fmt-name">Online Learning</span>
+            <span class="ac-fmt-sub">Self-paced · Live Cohorts</span>
+          </div>
+          <div class="ac-fmt">
+            <span class="ac-fmt-dot" aria-hidden="true"></span>
+            <span class="ac-fmt-name">In-Person Bootcamps</span>
+            <span class="ac-fmt-sub">Kuwait · Limited Seats</span>
+          </div>
+          <div class="ac-fmt">
+            <span class="ac-fmt-dot" aria-hidden="true"></span>
+            <span class="ac-fmt-name">Private Lab Infrastructure</span>
+            <span class="ac-fmt-sub">Hands-on Environments</span>
+          </div>
+        </div>
+
+        <div class="ac-pricing">
+          <span>Bootcamps starting from</span>
+          <strong>199.99 KD</strong>
+          <span>per participant</span>
+        </div>
+      </div>
+
+      <div class="ac-tracks reveal">
+
+        <div class="ac-curriculum">
+          <div class="ac-curriculum-label">Curriculum Areas</div>
+          <div class="ac-pills">
+            <span class="tag">Linux</span>
+            <span class="tag">Windows Internals</span>
+            <span class="tag">Networking</span>
+            <span class="tag">Operating Systems</span>
+            <span class="tag">Reverse Engineering</span>
+            <span class="tag">Web Security</span>
+            <span class="tag">Active Directory</span>
+            <span class="tag">Red Teaming</span>
+            <span class="tag">Malware Analysis</span>
+            <span class="tag">Exploit Development</span>
+            <span class="tag">Advanced Cryptography</span>
+            <span class="tag">iOS Security</span>
+            <span class="tag">macOS Security</span>
+            <span class="tag">Secure Programming</span>
+          </div>
+        </div>
+
+        <div class="ac-track">
+          <div class="at-head">
+            <span class="at-num">PATH 01</span>
+            <span class="at-name">Foundations</span>
+          </div>
+          <p class="at-desc">
+            Linux, networking fundamentals, operating system concepts, and basic cryptography.
+            No prerequisites — designed for students entering from any background.
+          </p>
+        </div>
+
+        <div class="ac-track">
+          <div class="at-head">
+            <span class="at-num">PATH 02</span>
+            <span class="at-name">Systems &amp; Web Security</span>
+          </div>
+          <p class="at-desc">
+            Windows Internals, Active Directory, web application security, and network
+            penetration testing. Hands-on lab environments throughout.
+          </p>
+        </div>
+
+        <div class="ac-track">
+          <div class="at-head">
+            <span class="at-num">PATH 03</span>
+            <span class="at-name">Offensive &amp; Research</span>
+          </div>
+          <p class="at-desc">
+            Red teaming, reverse engineering, malware analysis, exploit development,
+            and mobile platform security. Advanced content for students who have
+            completed the previous paths.
+          </p>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ RESEARCH BOOTCAMP ══════════════════════ -->
+<div class="bootcamp-band" id="bootcamp" aria-labelledby="bc-heading">
+  <div class="container">
+    <div class="bootcamp-inner">
+
+      <div class="reveal">
+        <div class="eyebrow">Featured Bootcamp</div>
+        <h2 class="bc-kicker" id="bc-heading">
+          0-Day Research in the<br/>
+          <em>Modern Security World</em>
+        </h2>
+        <div class="bc-meta">
+          <span class="tag tag-orange">6 Weeks</span>
+          <span class="tag">Advanced Level</span>
+          <span class="tag">In-Person · Kuwait</span>
+        </div>
+        <p class="bc-body">
+          This bootcamp focuses on understanding how software systems fail before
+          discussing how to find those failures. Participants learn memory management,
+          modern exploit mitigations, and vulnerability discovery methodology as
+          practiced in real-world security research.
+        </p>
+        <p class="bc-body">
+          The curriculum is inspired by the workflows used in professional vulnerability
+          research — including reverse engineering, root cause analysis, and responsible
+          disclosure practices.
+        </p>
+        <p class="bc-disclaimer">
+          This bootcamp does not guarantee that participants will discover
+          vulnerabilities. It provides training in the foundational skills and
+          research methodology used in the field.
+        </p>
+      </div>
+
+      <div class="bc-topics stagger reveal">
+        <div class="bc-topic">
+          <div class="bc-topic-label">Week 1–2</div>
+          <div class="bc-topic-text">Memory management, stack and heap internals, modern exploit mitigations — ASLR, DEP, CFG, and how they interact.</div>
+        </div>
+        <div class="bc-topic">
+          <div class="bc-topic-label">Week 3</div>
+          <div class="bc-topic-text">Static and dynamic reverse engineering. Understanding compiled code, debugging workflows, and binary analysis tooling.</div>
+        </div>
+        <div class="bc-topic">
+          <div class="bc-topic-label">Week 4</div>
+          <div class="bc-topic-text">Root cause analysis methodology. Tracing a bug from symptom to source across real-world vulnerability case studies.</div>
+        </div>
+        <div class="bc-topic">
+          <div class="bc-topic-label">Week 5</div>
+          <div class="bc-topic-text">Vulnerability discovery workflows. Fuzzing, code auditing, and structured approaches to finding security-relevant conditions.</div>
+        </div>
+        <div class="bc-topic">
+          <div class="bc-topic-label">Week 6</div>
+          <div class="bc-topic-text">Responsible disclosure: writing clear reports, coordinating with vendors, and understanding the ethics and legal context of security research.</div>
+        </div>
+        <div class="bc-topic">
+          <div class="bc-topic-label">Throughout</div>
+          <div class="bc-topic-text">Lab sessions using Stack's private infrastructure. Small groups. Direct instructor access throughout all six weeks.</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- ══ BUG BOUNTY PLATFORM ═══════════════════ -->
+<section class="section section--dark" id="platform" aria-labelledby="bb-heading">
+  <div class="container">
+    <div class="bb-layout">
+
+      <div class="bb-left reveal">
+        <div class="eyebrow">Bug Bounty Platform</div>
+        <h2 class="bb-kicker" id="bb-heading">
+          GCC-only.<br/>
+          <span>By design.</span>
+        </h2>
+        <p class="bb-body">
+          The Stack Bug Bounty Platform is planned after the Academy is established.
+          It will be a closed, curated vulnerability rewards environment built
+          exclusively for Gulf organisations and verified regional researchers.
+          Every program will be private. Every finding will be reviewed by people
+          who understand the regional context.
+        </p>
+        <div class="bb-regions">
+          <span class="tag">Kuwait</span>
+          <span class="tag">KSA</span>
+          <span class="tag">UAE</span>
+          <span class="tag">Qatar</span>
+          <span class="tag">Bahrain</span>
+          <span class="tag">Oman</span>
+        </div>
+      </div>
+
+      <div class="bb-pillars stagger reveal">
+        <div class="bb-pillar">
+          <div class="bp-label">Scope</div>
+          <p class="bp-text">Exclusively GCC organisations. Focused, regionally relevant, with programs structured for the local threat landscape.</p>
+        </div>
+        <div class="bb-pillar">
+          <div class="bp-label">Access Model</div>
+          <p class="bp-text">Private programs only. Researcher access is earned through verification and track record — not open registration.</p>
+        </div>
+        <div class="bb-pillar">
+          <div class="bp-label">Verified Researchers</div>
+          <p class="bp-text">Identity-verified researchers from the GCC. Tiered access and performance-based program invitations.</p>
+        </div>
+        <div class="bb-pillar">
+          <div class="bp-label">Payout Structure</div>
+          <p class="bp-text">Transparent reward ranges. No ambiguity between researchers and organisations. Straightforward payout for verified, impactful findings.</p>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ══ PHILOSOPHY ═════════════════════════════ -->
+<section class="section" id="philosophy" aria-labelledby="ph-heading">
+  <div class="container">
+    <div class="sec-header reveal">
+      <div>
+        <div class="eyebrow sec-eyebrow">Educational Philosophy</div>
+        <h2 class="sec-title" id="ph-heading" style="margin-top:18px">How we think<br/>about learning.</h2>
+      </div>
+      <p class="sec-desc">
+        Stack's curriculum is built around a single conviction: practitioners who
+        understand what they are doing produce better work and make better decisions
+        than those who have only learned to execute steps.
+      </p>
+    </div>
+
+    <div class="philosophy-grid stagger">
+      <div class="ph-card">
+        <div class="ph-num">01</div>
+        <div class="ph-principle">Understand before exploiting.</div>
+        <p class="ph-body">
+          Every attack technique has a mechanical explanation. We teach the
+          mechanism first. Students who understand why something works can adapt
+          when conditions change.
+        </p>
+      </div>
+      <div class="ph-card">
+        <div class="ph-num">02</div>
+        <div class="ph-principle">Learn systems, not tools.</div>
+        <p class="ph-body">
+          Tools come and go. The underlying system concepts — memory, protocols,
+          file formats, operating system internals — remain. We teach the substrate.
+        </p>
+      </div>
+      <div class="ph-card">
+        <div class="ph-num">03</div>
+        <div class="ph-principle">Depth over shortcuts.</div>
+        <p class="ph-body">
+          Progress through the curriculum requires demonstrating understanding, not
+          completing a checklist. We move slowly when necessary.
+        </p>
+      </div>
+      <div class="ph-card">
+        <div class="ph-num">04</div>
+        <div class="ph-principle">Research before automation.</div>
+        <p class="ph-body">
+          Automation is a productivity multiplier for people who already understand
+          what they are automating. We do not teach tools as a substitute for
+          that understanding.
+        </p>
+      </div>
+      <div class="ph-card">
+        <div class="ph-num">05</div>
+        <div class="ph-principle">Build professionals.</div>
+        <p class="ph-body">
+          The goal is practitioners who can work independently on hard problems —
+          not certification collectors or tool operators. Credentials are a
+          byproduct of competence, not a substitute for it.
+        </p>
+      </div>
+      <div class="ph-card">
+        <div class="ph-num">06</div>
+        <div class="ph-principle">Ethics is not optional.</div>
+        <p class="ph-body">
+          Responsible disclosure, legal boundaries, and professional conduct are
+          taught throughout the curriculum — not as a module at the end, but as
+          a baseline requirement from day one.
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ RESEARCH ═══════════════════════════════ -->
+<section class="section section--dark" id="research" aria-labelledby="re-heading">
+  <div class="container">
+    <div class="sec-header reveal">
+      <div class="sec-header-left">
+        <div class="eyebrow sec-eyebrow">Research</div>
+        <h2 class="sec-title" id="re-heading" style="margin-top:18px">Original research.<br/>Published here.</h2>
+      </div>
+    </div>
+
+    <p class="re-intro reveal">
+      Stack's research work covers vulnerability research, threat intelligence,
+      and security tooling relevant to the GCC. Findings are published here
+      after internal review and, where applicable, coordinated disclosure.
+    </p>
+
+    <div class="re-categories stagger" style="margin-bottom:1px;">
+      <div class="re-cat">
+        <div class="re-cat-label">Category</div>
+        <div class="re-cat-name">Security Advisories</div>
+        <div class="re-cat-desc">Coordinated disclosure notices for vulnerabilities discovered during research or responsible disclosure submissions.</div>
+        <div class="re-cat-footer"><span class="tag">Disclosure</span><span class="rp-soon">Coming Soon</span></div>
+      </div>
+      <div class="re-cat">
+        <div class="re-cat-label">Category</div>
+        <div class="re-cat-name">Whitepapers &amp; Notes</div>
+        <div class="re-cat-desc">Technical write-ups, analysis of vulnerability classes, and commentary on security engineering topics relevant to the region.</div>
+        <div class="re-cat-footer"><span class="tag">Technical</span><span class="rp-soon">Coming Soon</span></div>
+      </div>
+      <div class="re-cat">
+        <div class="re-cat-label">Category</div>
+        <div class="re-cat-name">Open Source Tools</div>
+        <div class="re-cat-desc">Utilities and frameworks developed internally and released publicly where appropriate. Code over claims.</div>
+        <div class="re-cat-footer"><span class="tag">GitHub</span><span class="rp-soon">Coming Soon</span></div>
+      </div>
+    </div>
+
+    <div class="re-grid stagger">
+      <article class="re-paper">
+        <div class="rp-top">
+          <span class="rp-id">RES — 001</span>
+          <span class="rp-soon">Upcoming</span>
+        </div>
+        <h3 class="rp-title">GCC Threat Landscape Report</h3>
+        <p class="rp-abstract">
+          A structured analysis of the vulnerability landscape and threat actor
+          activity targeting Gulf Cooperation Council infrastructure, public services,
+          and private sector organisations.
+        </p>
+        <div class="rp-tags">
+          <span class="tag">Threat Intelligence</span>
+          <span class="tag">GCC</span>
+          <span class="tag">Infrastructure</span>
+        </div>
+      </article>
+
+      <article class="re-paper">
+        <div class="rp-top">
+          <span class="rp-id">RES — 002</span>
+          <span class="rp-soon">Upcoming</span>
+        </div>
+        <h3 class="rp-title">Web Application Vulnerability Patterns</h3>
+        <p class="rp-abstract">
+          Catalogued findings from security assessments across regional targets —
+          recurring vulnerability classes, root causes, and remediation notes.
+        </p>
+        <div class="rp-tags">
+          <span class="tag">Web Security</span>
+          <span class="tag">Vulnerability Research</span>
+        </div>
+      </article>
+
+      <article class="re-paper">
+        <div class="rp-top">
+          <span class="rp-id">RES — 003</span>
+          <span class="rp-soon">Upcoming</span>
+        </div>
+        <h3 class="rp-title">Responsible Disclosure: A GCC Framework</h3>
+        <p class="rp-abstract">
+          A proposed disclosure standard for the GCC legal and regulatory
+          environment — intended for adoption by organisations and independent
+          researchers alike.
+        </p>
+        <div class="rp-tags">
+          <span class="tag">Policy</span>
+          <span class="tag">Disclosure</span>
+          <span class="tag">GCC</span>
+        </div>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- ══ TIMELINE ═══════════════════════════════ -->
+<section class="section" id="timeline" aria-labelledby="tl-heading">
+  <div class="container">
+    <div class="sec-header reveal">
+      <div>
+        <div class="eyebrow sec-eyebrow">Roadmap</div>
+        <h2 class="sec-title" id="tl-heading" style="margin-top:18px">How Stack<br/>comes together.</h2>
+      </div>
+      <p class="sec-desc">
+        Stack is being built in stages. Each phase must be functioning before
+        the next begins. The timeline below reflects our current plan.
+      </p>
+    </div>
+
+    <div class="timeline-wrap" id="tlWrap">
+      <div class="timeline-track">
+
+        <div class="tl-item">
+          <div class="tl-dot active" aria-hidden="true"><div class="tl-dot-inner"></div></div>
+          <div class="tl-content">
+            <div class="tl-phase">Phase 0 · Now</div>
+            <div class="tl-name">Research &amp; Foundation</div>
+            <p class="tl-desc">Curriculum development, lab infrastructure planning, and the early research program. This phase is underway.</p>
+          </div>
+        </div>
+
+        <div class="tl-item">
+          <div class="tl-dot" aria-hidden="true"><div class="tl-dot-inner"></div></div>
+          <div class="tl-content">
+            <div class="tl-phase">Phase 1 · Winter 2027</div>
+            <div class="tl-name">Academy Launch</div>
+            <p class="tl-desc">Stack Academy opens with online cohorts and the first in-person bootcamps in Kuwait.</p>
+            <div class="tl-eta"><span class="tag tag-orange">Winter 2027</span></div>
+          </div>
+        </div>
+
+        <div class="tl-item">
+          <div class="tl-dot" aria-hidden="true"><div class="tl-dot-inner"></div></div>
+          <div class="tl-content">
+            <div class="tl-phase">Phase 2</div>
+            <div class="tl-name">Private Lab Infrastructure</div>
+            <p class="tl-desc">Stack's own hands-on lab environment launches — persistent, realistic environments for Academy students and research work.</p>
+            <div class="tl-eta"><span class="tag">Post-Launch</span></div>
+          </div>
+        </div>
+
+        <div class="tl-item">
+          <div class="tl-dot" aria-hidden="true"><div class="tl-dot-inner"></div></div>
+          <div class="tl-content">
+            <div class="tl-phase">Phase 3</div>
+            <div class="tl-name">First Research Publications</div>
+            <p class="tl-desc">Security advisories, whitepapers, and regional threat intelligence reports begin publishing through the Stack research program.</p>
+            <div class="tl-eta"><span class="tag">TBD</span></div>
+          </div>
+        </div>
+
+        <div class="tl-item">
+          <div class="tl-dot" aria-hidden="true"><div class="tl-dot-inner"></div></div>
+          <div class="tl-content">
+            <div class="tl-phase">Phase 4</div>
+            <div class="tl-name">Bug Bounty Platform</div>
+            <p class="tl-desc">After the Academy is established and a verified researcher community exists, the GCC-focused bug bounty platform launches with private programs.</p>
+            <div class="tl-eta"><span class="tag">Post-Academy</span></div>
+          </div>
+        </div>
+
+        <div class="tl-item">
+          <div class="tl-dot" aria-hidden="true"><div class="tl-dot-inner"></div></div>
+          <div class="tl-content">
+            <div class="tl-phase">Phase 5</div>
+            <div class="tl-name">Regional Expansion</div>
+            <p class="tl-desc">Extending Academy programs and platform operations across the broader GCC. Partnerships with regional organisations.</p>
+            <div class="tl-eta"><span class="tag">Long-term</span></div>
+          </div>
+        </div>
+
+        <div class="tl-item">
+          <div class="tl-dot" aria-hidden="true"><div class="tl-dot-inner"></div></div>
+          <div class="tl-content">
+            <div class="tl-phase">Phase 6</div>
+            <div class="tl-name">Future Infrastructure</div>
+            <p class="tl-desc">Additional programs and infrastructure determined by what the community needs at the time — defined as Stack matures.</p>
+            <div class="tl-eta"><span class="tag">TBD</span></div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ LEADERSHIP ═════════════════════════════ -->
+<section class="section section--dark" id="team" aria-labelledby="team-heading">
+  <div class="container">
+    <div class="sec-header reveal">
+      <div class="sec-header-left">
+        <div class="eyebrow sec-eyebrow">Leadership</div>
+        <h2 class="sec-title" id="team-heading" style="margin-top:18px">The team<br/>behind Stack.</h2>
+      </div>
+    </div>
+
+    <div class="team-grid stagger">
+
+      <div class="member">
+        <div class="member-initial" aria-hidden="true">TA</div>
+        <span class="member-role">Founder</span>
+        <h3 class="member-name">Thamer<br/>Almutairi</h3>
+        <p class="member-bio">
+          Security researcher Discovered 3+ zero-days and holds certifications including eWPTXv3, eCPPTv3, and additional professional credentials in cybersecurity
+        </p>
+        <a href="https://almutairi.xyz" target="_blank" rel="noopener noreferrer" class="member-link">
+          almutairi.xyz
+          <svg viewBox="0 0 10 10" aria-hidden="true"><path d="M3 1h6v6M9 1 1 9"/></svg>
+        </a>
+      </div>
+
+      <div class="member">
+        <div class="member-initial" aria-hidden="true">AA</div>
+        <span class="member-role">Chief Executive Officer</span>
+        <h3 class="member-name">Ahmed<br/>Alenzi</h3>
+        <p class="member-bio">
+Purple Teamer & Security Researcher with a solid understanding of cybersecurity. Founder of the KTech Cybersecurity Club and holder of 10+ cybersecurity certifications      </div>
+
+      <div class="member">
+        <div class="member-initial" aria-hidden="true">AO</div>
+        <span class="member-role">Chief Technology Officer</span>
+        <h3 class="member-name">Abdulaziz<br/>Alodan</h3>
+        <p class="member-bio">
+Full-Stack Developer & Penetration Tester. Founder of PwnTheCity, a cybersecurity platform, with multiple competition wins and professional certifications..        </p>
+        <a href="https://al0dan.com" target="_blank" rel="noopener noreferrer" class="member-link">
+          al0dan.com
+          <svg viewBox="0 0 10 10" aria-hidden="true"><path d="M3 1h6v6M9 1 1 9"/></svg>
+        </a>
+      </div>
+
+      <div class="member">
+        <div class="member-initial" aria-hidden="true">AD</div>
+        <span class="member-role">Chief Operating Officer</span>
+        <h3 class="member-name">Abdulhadi<br/>Aldwasri</h3>
+        <p class="member-bio">
+          Penetration tester and red team practitioner with a focus on offensive
+          security operations.
+        </p>
+        <span class="member-link member-link-placeholder" aria-hidden="true">—</span>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ══ CTA BAND ═══════════════════════════════ -->
+<div class="cta-band">
+  <div class="container">
+    <div class="cta-inner reveal">
+      <div class="cta-left">
+        <div class="eyebrow cta-eyebrow">Get in touch</div>
+        <h2 class="cta-headline" style="margin-top:16px">
+          Building the security<br/>
+          infrastructure the<br/>
+          <span>GCC deserves.</span>
+        </h2>
+      </div>
+      <div class="cta-right">
+        <a href="mailto:SOON" class="cta-email">SOON</a>
+        <div class="cta-social">
+          <a href="#" class="cs-link" aria-label="GitHub (coming soon)">GitHub (coming soon)</a>
+          <a href="#" class="cs-link" aria-label="LinkedIn (coming soon)">LinkedIn (coming soon)</a>
+          <a href="#" class="cs-link" aria-label="X / Twitter (coming soon)">X (coming soon)</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+</main>
+
+<!-- ══ FOOTER ═════════════════════════════════ -->
+<footer>
+  <div class="container">
+    <div class="footer-top">
+      <div class="footer-cols">
+
+        <div class="ft-brand">
+          <span class="ft-logo"><span class="b">[</span>STACK<span class="b">]</span></span>
+          <p class="ft-tagline">Kuwait's first security research enterprise. Built for the GCC. Launching Winter 2027.</p>
+        </div>
+
+        <div class="footer-col">
+          <div class="footer-col-title">Organization</div>
+          <ul>
+            <li><a href="#vision">Mission</a></li>
+            <li><a href="#philosophy">Philosophy</a></li>
+            <li><a href="#team">Leadership</a></li>
+            <li><a href="#timeline">Roadmap</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-col">
+          <div class="footer-col-title">Programs</div>
+          <ul>
+            <li><a href="#academy">Academy</a></li>
+            <li><a href="#bootcamp">Research Bootcamp</a></li>
+            <li><a href="#platform">Bug Bounty Platform</a></li>
+            <li>
+              <a href="#" aria-label="Careers — Coming Soon">Careers <span class="soon-tag">Soon</span></a>
+            </li>
+          </ul>
+        </div>
+
+        <div class="footer-col">
+          <div class="footer-col-title">Research</div>
+          <ul>
+            <li><a href="#research">Publications</a></li>
+            <li>
+              <a href="mailto:disclosure@stacksec.io">Responsible Disclosure</a>
+            </li>
+            <li>
+              <a href="#" aria-label="Open Source Tools — Coming Soon">Open Source <span class="soon-tag">Soon</span></a>
+            </li>
+          </ul>
+        </div>
+
+        <div class="footer-col">
+          <div class="footer-col-title">Legal</div>
+          <ul>
+            <li><a href="#">Privacy Policy</a></li>
+            <li><a href="#">Terms of Use</a></li>
+          </ul>
+        </div>
+
+      </div>
+    </div>
+
+    <div class="footer-bottom">
+      <span class="ft-copy">© 2026 Stack Security Research · Kuwait · All rights reserved</span>
+      <span class="ft-coord">29.3759° N · 47.9774° E</span>
+    </div>
+  </div>
+</footer>
+
+<script>
+/* ── Hero canvas: grid + scan line ─────────── */
+(function () {
+  const canvas = document.getElementById('heroCanvas');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  let W, H, scanY = 0;
+
+  function resize() {
+    W = canvas.offsetWidth;
+    H = canvas.offsetHeight;
+    canvas.width  = W * devicePixelRatio;
+    canvas.height = H * devicePixelRatio;
+    ctx.scale(devicePixelRatio, devicePixelRatio);
+  }
+
+  function draw() {
+    ctx.clearRect(0, 0, W, H);
+    const step = 64;
+
+    ctx.strokeStyle = 'rgba(255,255,255,0.035)';
+    ctx.lineWidth = 0.5;
+    for (let x = 0; x < W; x += step) {
+      ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, H); ctx.stroke();
+    }
+    for (let y = 0; y < H; y += step) {
+      ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(W, y); ctx.stroke();
+    }
+
+    const grad = ctx.createLinearGradient(0, scanY - 70, 0, scanY + 70);
+    grad.addColorStop(0,   'rgba(240,90,0,0)');
+    grad.addColorStop(0.5, 'rgba(240,90,0,0.05)');
+    grad.addColorStop(1,   'rgba(240,90,0,0)');
+    ctx.fillStyle = grad;
+    ctx.fillRect(0, scanY - 70, W, 140);
+
+    ctx.strokeStyle = 'rgba(240,90,0,0.10)';
+    ctx.lineWidth = 1;
+    ctx.beginPath(); ctx.moveTo(0, scanY); ctx.lineTo(W, scanY); ctx.stroke();
+
+    scanY += 0.55;
+    if (scanY > H + 70) scanY = -70;
+    requestAnimationFrame(draw);
+  }
+
+  resize();
+  draw();
+  window.addEventListener('resize', resize, { passive: true });
+})();
+
+/* ── Intersection reveal ────────────────────── */
+const io = new IntersectionObserver((entries) => {
+  entries.forEach(e => {
+    if (!e.isIntersecting) return;
+    e.target.classList.add('in');
+    io.unobserve(e.target);
+  });
+}, { threshold: 0.07 });
+
+document.querySelectorAll('.reveal, .stagger').forEach(el => io.observe(el));
+
+/* ── Timeline items reveal ──────────────────── */
+const tlio = new IntersectionObserver((entries) => {
+  entries.forEach(e => {
+    if (!e.isIntersecting) return;
+    e.target.classList.add('in');
+    tlio.unobserve(e.target);
+  });
+}, { threshold: 0.15 });
+
+document.querySelectorAll('.tl-item').forEach(el => tlio.observe(el));
+
+/* ── Nav scroll tint ────────────────────────── */
+const nav = document.getElementById('nav');
+window.addEventListener('scroll', () => {
+  nav.style.background = window.scrollY > 40
+    ? 'rgba(6,6,9,0.97)'
+    : 'rgba(6,6,9,0.84)';
+}, { passive: true });
+
+/* ── Active nav link ────────────────────────── */
+const sections = document.querySelectorAll('section[id], div[id]');
+const navAs    = document.querySelectorAll('.nav-links a');
+const sio = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      const id = e.target.id;
+      navAs.forEach(a => {
+        const isActive = a.getAttribute('href') === `#${id}`;
+        a.style.color = isActive ? 'var(--white)' : '';
+      });
+    }
+  });
+}, { rootMargin: '-40% 0px -55% 0px' });
+sections.forEach(s => sio.observe(s));
+
+/* ── Mobile menu ────────────────────────────── */
+const ham    = document.getElementById('hamburger');
+const drawer = document.getElementById('drawer');
+let menuOpen = false;
+
+function closeDrawer() {
+  menuOpen = false;
+  drawer.classList.remove('open');
+  ham.setAttribute('aria-expanded', 'false');
+  ham.setAttribute('aria-label', 'Open menu');
+}
+
+ham.addEventListener('click', () => {
+  menuOpen = !menuOpen;
+  drawer.classList.toggle('open', menuOpen);
+  ham.setAttribute('aria-expanded', menuOpen ? 'true' : 'false');
+  ham.setAttribute('aria-label', menuOpen ? 'Close menu' : 'Open menu');
+});
+
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape' && menuOpen) closeDrawer();
+});
+</script>
+</body>
+</html>
