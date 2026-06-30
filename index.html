@@ -4,15 +4,15 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Thamer Almutairi</title>
-    
+
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600&display=swap" rel="stylesheet">
-    
+
     <!-- Minecraft Font Integration -->
     <link href="https://fonts.cdnfonts.com/css/minecraft-4" rel="stylesheet">
-    
+
     <style>
         :root {
             --bg: #000000;
@@ -22,7 +22,6 @@
             --border: #27272A;
             --border-hover: #3F3F46;
             --card-hover: #09090B;
-            --accent: #10B981; /* Status dot green */
         }
 
         * {
@@ -70,31 +69,45 @@
         }
 
         .status-dot {
-            width: 8px;
-            height: 8px;
-            background-color: var(--accent);
-            border-radius: 50%;
-            position: relative;
-        }
-
-        .status-dot::after {
-            content: '';
-            position: absolute;
-            top: -2px; left: -2px; right: -2px; bottom: -2px;
-            background-color: var(--accent);
-            border-radius: 50%;
-            opacity: 0.4;
-            animation: pulse 2.5s infinite ease-in-out;
-        }
-
-        @keyframes pulse {
-            0% { transform: scale(0.8); opacity: 0.5; }
-            50% { transform: scale(1.5); opacity: 0; }
-            100% { transform: scale(0.8); opacity: 0; }
+            width: 6px;
+            height: 6px;
+            background-color: var(--fg-secondary);
+            border-radius: 1px; /* small pixel-square, no glow/animation */
         }
 
         /* Header */
         header {
+            display: flex;
+            align-items: center;
+            gap: 1.25rem;
+        }
+
+        .avatar {
+            width: 64px;
+            height: 64px;
+            flex-shrink: 0;
+            border: 2px solid var(--border);
+            border-radius: 4px;
+            background-color: var(--card-hover);
+            background-size: cover;
+            background-position: center;
+            image-rendering: pixelated;
+            position: relative;
+        }
+
+        /* subtle pixel-corner accent */
+        .avatar::after {
+            content: '';
+            position: absolute;
+            width: 6px;
+            height: 6px;
+            background-color: var(--fg-primary);
+            bottom: -3px;
+            right: -3px;
+            border-radius: 1px;
+        }
+
+        .header-text {
             display: flex;
             flex-direction: column;
             gap: 0.25rem;
@@ -102,24 +115,24 @@
 
         h1 {
             font-family: 'Minecraft', sans-serif;
-            font-size: 1.5rem;
+            font-size: 1.4rem;
             font-weight: 400;
             letter-spacing: 0.02em;
             display: flex;
             align-items: center;
-            gap: 0.75rem;
+            gap: 0.6rem;
         }
 
         .age {
             font-family: 'Space Grotesk', sans-serif;
-            font-size: 0.875rem;
+            font-size: 0.85rem;
             font-weight: 400;
             color: var(--fg-muted);
             letter-spacing: normal;
         }
 
         .roles {
-            font-size: 0.95rem;
+            font-size: 0.9rem;
             color: var(--fg-secondary);
             letter-spacing: -0.01em;
         }
@@ -146,11 +159,22 @@
 
         .section-title {
             font-family: 'Minecraft', sans-serif;
-            font-size: 0.75rem;
+            font-size: 0.7rem;
             font-weight: 400;
             text-transform: uppercase;
             letter-spacing: 0.08em;
             color: var(--fg-muted);
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+
+        .section-title::before {
+            content: '';
+            width: 5px;
+            height: 5px;
+            background-color: var(--fg-muted);
+            display: inline-block;
         }
 
         .cards-wrapper {
@@ -166,7 +190,7 @@
             padding: 1rem;
             background-color: transparent;
             border: 1px solid var(--border);
-            border-radius: 6px;
+            border-radius: 4px;
             text-decoration: none;
             transition: all 0.15s ease;
             position: relative;
@@ -191,7 +215,7 @@
 
         .card-title {
             font-family: 'Minecraft', sans-serif;
-            font-size: 0.95rem;
+            font-size: 0.9rem;
             font-weight: 400;
             color: var(--fg-primary);
             letter-spacing: 0.02em;
@@ -231,14 +255,15 @@
         .cert-item {
             padding: 0.75rem 1rem;
             border: 1px solid var(--border);
-            border-radius: 6px;
-            font-size: 0.9rem;
+            border-radius: 4px;
+            font-size: 0.85rem;
             font-weight: 500;
             color: var(--fg-secondary);
             text-align: center;
             letter-spacing: -0.02em;
             background-color: transparent;
             transition: all 0.15s ease;
+            font-family: 'Minecraft', sans-serif;
         }
 
         .cert-item:hover {
@@ -273,6 +298,13 @@
             .container {
                 padding-top: 8vh;
             }
+            header {
+                gap: 1rem;
+            }
+            .avatar {
+                width: 56px;
+                height: 56px;
+            }
             .card {
                 flex-direction: column;
                 gap: 0.25rem;
@@ -292,37 +324,32 @@
 <body>
 
     <main class="container">
-        
+
         <!-- Local Time & Status -->
         <div class="status-bar">
             <div class="status-dot"></div>
             <span>Kuwait City &bull; <span id="local-time">--:--</span></span>
         </div>
-        
+
         <!-- Header Profile -->
         <header>
-            <h1>Thamer Almutairi <span class="age">(17)</span></h1>
-            <p class="roles">Developer, Security Researcher & Penetration Tester</p>
+            <div class="avatar" style="background-image: url('avatar.jpg');"></div>
+            <div class="header-text">
+                <h1>Thamer Almutairi <span class="age">(17)</span></h1>
+                <p class="roles">Developer, Security Researcher & Penetration Tester</p>
+            </div>
         </header>
-        
+
         <!-- Biography -->
         <section class="bio">
-            <p>I love hacking <span class="mono">&lt;;</span></p>
+            <p>Hack. Chess. Lift. Repeat. <span class="mono">&lt;;</span></p>
         </section>
-        
+
         <!-- Projects / Ventures Section -->
         <div class="section-block">
             <span class="section-title">Initiatives</span>
             <section class="cards-wrapper">
-                
-                <a href="stack.html" class="card">
-                    <div class="card-left">
-                        <span class="card-title">STACK</span>
-                        <span class="card-role">Founder</span>
-                    </div>
-                    <div class="card-meta">ETA 2026 <span class="card-arrow">↗</span></div>
-                </a>
-                                
+
                 <a href="https://x.com/pwnthecity" class="card">
                     <div class="card-left">
                         <span class="card-title">PwnTheCity</span>
@@ -330,10 +357,10 @@
                     </div>
                     <div class="card-meta">Cybersecurity <span class="card-arrow">↗</span></div>
                 </a>
-                
+
             </section>
         </div>
-        
+
         <!-- Certifications Section -->
         <div class="section-block">
             <span class="section-title">Certifications</span>
@@ -345,7 +372,7 @@
                 <div class="cert-item">CRTA</div>
             </section>
         </div>
-        
+
         <!-- Social Footer Links -->
         <section class="socials">
             <a href="https://x.com/sliusx" target="_blank" rel="noopener noreferrer">Twitter</a>
@@ -354,7 +381,7 @@
             <a href="https://www.instagram.com/0xth4mer/" target="_blank" rel="noopener noreferrer">Instagram</a>
             <a href="https://www.tiktok.com/@itkilh" target="_blank" rel="noopener noreferrer">TikTok</a>
         </section>
-        
+
     </main>
 
     <script>
@@ -362,17 +389,17 @@
         function updateTime() {
             const timeElement = document.getElementById('local-time');
             const now = new Date();
-                        
-            const options = { 
-                timeZone: 'Asia/Kuwait', 
-                hour: '2-digit', 
-                minute: '2-digit', 
-                hour12: true 
+
+            const options = {
+                timeZone: 'Asia/Kuwait',
+                hour: '2-digit',
+                minute: '2-digit',
+                hour12: true
             };
-                        
+
             timeElement.textContent = new Intl.DateTimeFormat('en-US', options).format(now);
         }
-        
+
         updateTime();
         setInterval(updateTime, 1000);
 
